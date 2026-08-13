@@ -1,0 +1,280 @@
+<UserControl
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="Lorcaire.Desktop.Views.DashboardView">
+
+    <Grid RowDefinitions="Auto,Auto,*"
+          RowSpacing="18">
+
+        <!-- Tarjetas superiores -->
+        <Grid
+            Grid.Row="0"
+            ColumnDefinitions="*,*,*,*"
+            ColumnSpacing="16">
+
+            <Border
+                Grid.Column="0"
+                Background="#0F151B"
+                BorderBrush="#252D36"
+                BorderThickness="1"
+                CornerRadius="10"
+                Padding="20">
+
+                <StackPanel>
+                    <TextBlock Text="Goals"
+                               Foreground="White"
+                               FontSize="16"/>
+
+                    <TextBlock Text="12"
+                               Foreground="White"
+                               FontSize="30"
+                               Margin="0,8,0,0"/>
+
+                    <TextBlock Text="4 in progress"
+                               Foreground="#929AA5"
+                               FontSize="12"
+                               Margin="0,4,0,0"/>
+
+                    <Border Height="4"
+                            Background="#E8B04A"
+                            CornerRadius="2"
+                            Margin="0,15,40,0"/>
+                </StackPanel>
+            </Border>
+
+            <Border
+                Grid.Column="1"
+                Background="#0F151B"
+                BorderBrush="#252D36"
+                BorderThickness="1"
+                CornerRadius="10"
+                Padding="20">
+
+                <StackPanel>
+                    <TextBlock Text="Projects"
+                               Foreground="White"
+                               FontSize="16"/>
+
+                    <TextBlock Text="7"
+                               Foreground="White"
+                               FontSize="30"
+                               Margin="0,8,0,0"/>
+
+                    <TextBlock Text="3 active"
+                               Foreground="#929AA5"
+                               FontSize="12"
+                               Margin="0,4,0,0"/>
+
+                    <Border Height="4"
+                            Background="#E8B04A"
+                            CornerRadius="2"
+                            Margin="0,15,55,0"/>
+                </StackPanel>
+            </Border>
+
+            <Border
+                Grid.Column="2"
+                Background="#0F151B"
+                BorderBrush="#252D36"
+                BorderThickness="1"
+                CornerRadius="10"
+                Padding="20">
+
+                <StackPanel>
+                    <TextBlock Text="Tasks"
+                               Foreground="White"
+                               FontSize="16"/>
+
+                    <TextBlock Text="24"
+                               Foreground="White"
+                               FontSize="30"
+                               Margin="0,8,0,0"/>
+
+                    <TextBlock Text="8 due soon"
+                               Foreground="#929AA5"
+                               FontSize="12"
+                               Margin="0,4,0,0"/>
+
+                    <Border Height="4"
+                            Background="#E8B04A"
+                            CornerRadius="2"
+                            Margin="0,15,30,0"/>
+                </StackPanel>
+            </Border>
+
+            <Border
+                Grid.Column="3"
+                Background="#0F151B"
+                BorderBrush="#252D36"
+                BorderThickness="1"
+                CornerRadius="10"
+                Padding="20">
+
+                <StackPanel>
+                    <TextBlock Text="Resources"
+                               Foreground="White"
+                               FontSize="16"/>
+
+                    <TextBlock Text="15"
+                               Foreground="White"
+                               FontSize="30"
+                               Margin="0,8,0,0"/>
+
+                    <TextBlock Text="5 favorites"
+                               Foreground="#929AA5"
+                               FontSize="12"
+                               Margin="0,4,0,0"/>
+
+                    <Border Height="4"
+                            Background="#E8B04A"
+                            CornerRadius="2"
+                            Margin="0,15,45,0"/>
+                </StackPanel>
+            </Border>
+
+        </Grid>
+
+        <!-- Paneles centrales -->
+        <Grid
+            Grid.Row="1"
+            ColumnDefinitions="*,*"
+            ColumnSpacing="18">
+
+            <Border
+                Grid.Column="0"
+                Background="#0F151B"
+                BorderBrush="#252D36"
+                BorderThickness="1"
+                CornerRadius="10"
+                Padding="22">
+
+                <StackPanel>
+                    <TextBlock
+                        Text="Today's Focus"
+                        Foreground="White"
+                        FontSize="18"
+                        FontWeight="SemiBold"/>
+
+                    <TextBlock
+                        Text="Discipline is the bridge between goals and accomplishment."
+                        Foreground="#89929C"
+                        FontSize="12"
+                        FontStyle="Italic"
+                        Margin="0,10,0,18"/>
+
+                    <TextBlock
+                        Text="○   Finish Lorcaire core integration"
+                        Foreground="#E6E9ED"
+                        FontSize="14"
+                        Margin="0,7"/>
+
+                    <TextBlock
+                        Text="○   Workout"
+                        Foreground="#E6E9ED"
+                        FontSize="14"
+                        Margin="0,7"/>
+
+                    <TextBlock
+                        Text="○   Read 20 pages"
+                        Foreground="#E6E9ED"
+                        FontSize="14"
+                        Margin="0,7"/>
+
+                    <TextBlock
+                        Text="○   Review project plan"
+                        Foreground="#E6E9ED"
+                        FontSize="14"
+                        Margin="0,7"/>
+
+                    <TextBlock
+                        Text="View all tasks →"
+                        Foreground="#E8B04A"
+                        FontSize="13"
+                        Margin="0,14,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <Border
+                Grid.Column="1"
+                Background="#0F151B"
+                BorderBrush="#252D36"
+                BorderThickness="1"
+                CornerRadius="10"
+                Padding="22">
+
+                <StackPanel>
+
+                    <Grid ColumnDefinitions="*,Auto">
+
+                        <TextBlock
+                            Text="Upcoming"
+                            Foreground="White"
+                            FontSize="18"
+                            FontWeight="SemiBold"/>
+
+                        <TextBlock
+                            Grid.Column="1"
+                            Text="View calendar →"
+                            Foreground="#E8B04A"
+                            FontSize="13"/>
+
+                    </Grid>
+
+                    <TextBlock
+                        Text="Tomorrow     Project review     10:00"
+                        Foreground="#DCE0E5"
+                        FontSize="13"
+                        Margin="0,26,0,12"/>
+
+                    <Border Height="1"
+                            Background="#222A32"/>
+
+                    <TextBlock
+                        Text="Aug 13       Workout            07:00"
+                        Foreground="#DCE0E5"
+                        FontSize="13"
+                        Margin="0,16,0,12"/>
+
+                    <Border Height="1"
+                            Background="#222A32"/>
+
+                    <TextBlock
+                        Text="Aug 14       Goal review        20:00"
+                        Foreground="#DCE0E5"
+                        FontSize="13"
+                        Margin="0,16,0,12"/>
+
+                    <Border Height="1"
+                            Background="#222A32"/>
+
+                    <TextBlock
+                        Text="Aug 15       Study time         18:00"
+                        Foreground="#DCE0E5"
+                        FontSize="13"
+                        Margin="0,16,0,0"/>
+
+                </StackPanel>
+            </Border>
+
+        </Grid>
+
+        <!-- Progress -->
+        <Border
+            Grid.Row="2"
+            Background="#0F151B"
+            BorderBrush="#252D36"
+            BorderThickness="1"
+            CornerRadius="10"
+            Padding="20"
+            VerticalAlignment="Top">
+
+            <TextBlock
+                Text="Progress Overview     Goals 66%      Projects 57%      Tasks 72%      Habits 45%"
+                Foreground="#DCE0E5"
+                FontSize="14"/>
+
+        </Border>
+
+    </Grid>
+
+</UserControl>
