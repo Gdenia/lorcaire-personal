@@ -22,7 +22,8 @@ public sealed class GetGoalsHandler
                 goal.Id.Value,
                 goal.AreaId.Value,
                 goal.Name,
-                goal.Description))
+                goal.Description,
+                goal.IsCompleted))
             .ToArray();
     }
 }

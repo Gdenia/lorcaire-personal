@@ -12,16 +12,20 @@ public sealed class Goal
 
     public string? Description { get; private set; }
 
+    public bool IsCompleted { get; private set; }
+
     public Goal(
         GoalId id,
         AreaId areaId,
         string name,
-        string? description = null)
+        string? description = null,
+        bool isCompleted = false)
     {
         Id = id;
         AreaId = areaId;
         Name = ValidateName(name);
         Description = NormalizeDescription(description);
+        IsCompleted = isCompleted;
     }
 
     public void Rename(string name)
@@ -32,6 +36,16 @@ public sealed class Goal
     public void ChangeDescription(string? description)
     {
         Description = NormalizeDescription(description);
+    }
+
+    public void Complete()
+    {
+        IsCompleted = true;
+    }
+
+    public void Reopen()
+    {
+        IsCompleted = false;
     }
 
     private static string ValidateName(string name)

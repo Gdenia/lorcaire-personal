@@ -4,4 +4,5 @@ public sealed record GoalSummary(
     Guid Id,
     Guid AreaId,
     string Name,
-    string? Description);
+    string? Description,
+    bool IsCompleted);

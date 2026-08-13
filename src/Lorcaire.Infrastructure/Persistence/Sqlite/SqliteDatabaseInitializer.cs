@@ -38,10 +38,11 @@ public sealed class SqliteDatabaseInitializer
 
                 CREATE TABLE IF NOT EXISTS goals
                 (
-                    id          TEXT NOT NULL PRIMARY KEY,
-                    area_id     TEXT NOT NULL,
-                    name        TEXT NOT NULL,
-                    description TEXT NULL,
+                    id           TEXT NOT NULL PRIMARY KEY,
+                    area_id      TEXT NOT NULL,
+                    name         TEXT NOT NULL,
+                    description  TEXT NULL,
+                    is_completed INTEGER NOT NULL DEFAULT 0,
 
                     FOREIGN KEY (area_id)
                         REFERENCES areas (id)
@@ -57,6 +58,43 @@ public sealed class SqliteDatabaseInitializer
                 """;
 
             await schemaCommand.ExecuteNonQueryAsync(
+                cancellationToken);
+        }
+
+        var hasIsCompletedColumn = false;
+
+        await using (var checkCommand = connection.CreateCommand())
+        {
+            checkCommand.Transaction = transaction;
+            checkCommand.CommandText = "PRAGMA table_info(goals);";
+
+            await using var reader =
+                await checkCommand.ExecuteReaderAsync(cancellationToken);
+
+            while (await reader.ReadAsync(cancellationToken))
+            {
+                if (reader.GetString(1) == "is_completed")
+                {
+                    hasIsCompletedColumn = true;
+                    break;
+                }
+            }
+        }
+
+        if (!hasIsCompletedColumn)
+        {
+            await using var migrationCommand =
+                connection.CreateCommand();
+
+            migrationCommand.Transaction = transaction;
+
+            migrationCommand.CommandText =
+                """
+                ALTER TABLE goals
+                ADD COLUMN is_completed INTEGER NOT NULL DEFAULT 0;
+                """;
+
+            await migrationCommand.ExecuteNonQueryAsync(
                 cancellationToken);
         }
 
