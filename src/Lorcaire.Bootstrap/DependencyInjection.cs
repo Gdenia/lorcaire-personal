@@ -5,6 +5,10 @@ using Lorcaire.Application.Goals.Persistence;
 using Lorcaire.Application.Projects.CreateProject;
 using Lorcaire.Application.Projects.GetProjects;
 using Lorcaire.Application.Projects.Persistence;
+using Lorcaire.Application.Tasks.ChangeTaskStatus;
+using Lorcaire.Application.Tasks.CreateTask;
+using Lorcaire.Application.Tasks.GetTasks;
+using Lorcaire.Application.Tasks.Persistence;
 using Lorcaire.Core.Domain.Areas;
 using Lorcaire.Infrastructure.Persistence.Sqlite;
 using Microsoft.Extensions.DependencyInjection;
@@ -73,6 +77,23 @@ public static class DependencyInjection
 
         services.AddTransient<CreateProjectHandler>();
         services.AddTransient<GetProjectsHandler>();
+
+        services.AddSingleton<SqliteTaskRepository>();
+
+        services.AddSingleton<ITaskRepository>(
+            provider =>
+                provider.GetRequiredService<
+                    SqliteTaskRepository>());
+
+        services.AddSingleton<ITaskReader>(
+            provider =>
+                provider.GetRequiredService<
+                    SqliteTaskRepository>());
+
+        services.AddTransient<CreateTaskHandler>();
+        services.AddTransient<GetTasksHandler>();
+        services.AddTransient<CompleteTaskHandler>();
+        services.AddTransient<ReopenTaskHandler>();
 
         return services.BuildServiceProvider();
     }

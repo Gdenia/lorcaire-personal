@@ -5,6 +5,9 @@ using Lorcaire.Application.Goals.CreateGoal;
 using Lorcaire.Application.Goals.GetGoals;
 using Lorcaire.Application.Projects.CreateProject;
 using Lorcaire.Application.Projects.GetProjects;
+using Lorcaire.Application.Tasks.ChangeTaskStatus;
+using Lorcaire.Application.Tasks.CreateTask;
+using Lorcaire.Application.Tasks.GetTasks;
 using Lorcaire.Desktop.Views;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -16,6 +19,10 @@ public partial class MainWindow : Window
     private readonly GetGoalsHandler _getGoalsHandler;
     private readonly CreateProjectHandler _createProjectHandler;
     private readonly GetProjectsHandler _getProjectsHandler;
+    private readonly CreateTaskHandler _createTaskHandler;
+    private readonly GetTasksHandler _getTasksHandler;
+    private readonly CompleteTaskHandler _completeTaskHandler;
+    private readonly ReopenTaskHandler _reopenTaskHandler;
     private readonly WorkspaceContext _workspaceContext;
 
     // Constructor requerido por Avalonia para localizar la ventana
@@ -26,6 +33,10 @@ public partial class MainWindow : Window
             App.Services.GetRequiredService<GetGoalsHandler>(),
             App.Services.GetRequiredService<CreateProjectHandler>(),
             App.Services.GetRequiredService<GetProjectsHandler>(),
+            App.Services.GetRequiredService<CreateTaskHandler>(),
+            App.Services.GetRequiredService<GetTasksHandler>(),
+            App.Services.GetRequiredService<CompleteTaskHandler>(),
+            App.Services.GetRequiredService<ReopenTaskHandler>(),
             App.Services.GetRequiredService<WorkspaceContext>())
     {
     }
@@ -36,18 +47,30 @@ public partial class MainWindow : Window
         GetGoalsHandler getGoalsHandler,
         CreateProjectHandler createProjectHandler,
         GetProjectsHandler getProjectsHandler,
+        CreateTaskHandler createTaskHandler,
+        GetTasksHandler getTasksHandler,
+        CompleteTaskHandler completeTaskHandler,
+        ReopenTaskHandler reopenTaskHandler,
         WorkspaceContext workspaceContext)
     {
         ArgumentNullException.ThrowIfNull(createGoalHandler);
         ArgumentNullException.ThrowIfNull(getGoalsHandler);
         ArgumentNullException.ThrowIfNull(createProjectHandler);
         ArgumentNullException.ThrowIfNull(getProjectsHandler);
+        ArgumentNullException.ThrowIfNull(createTaskHandler);
+        ArgumentNullException.ThrowIfNull(getTasksHandler);
+        ArgumentNullException.ThrowIfNull(completeTaskHandler);
+        ArgumentNullException.ThrowIfNull(reopenTaskHandler);
         ArgumentNullException.ThrowIfNull(workspaceContext);
 
         _createGoalHandler = createGoalHandler;
         _getGoalsHandler = getGoalsHandler;
         _createProjectHandler = createProjectHandler;
         _getProjectsHandler = getProjectsHandler;
+        _createTaskHandler = createTaskHandler;
+        _getTasksHandler = getTasksHandler;
+        _completeTaskHandler = completeTaskHandler;
+        _reopenTaskHandler = reopenTaskHandler;
         _workspaceContext = workspaceContext;
 
         InitializeComponent();
@@ -93,7 +116,14 @@ public partial class MainWindow : Window
         RoutedEventArgs e)
     {
         SetActiveNavigation(TasksButton);
-        ShowPlaceholder("Tasks");
+        PageTitle.Text = "Tasks";
+
+        PageContent.Content = new TasksView(
+            _createTaskHandler,
+            _getTasksHandler,
+            _completeTaskHandler,
+            _reopenTaskHandler,
+            _workspaceContext);
     }
 
     private void ShowResources(
