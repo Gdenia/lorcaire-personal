@@ -1,10 +1,16 @@
 using Lorcaire.Application;
+using Lorcaire.Application.Calendar.CreateCalendarEvent;
+using Lorcaire.Application.Calendar.GetCalendarEvents;
+using Lorcaire.Application.Calendar.Persistence;
 using Lorcaire.Application.Goals.CreateGoal;
 using Lorcaire.Application.Goals.GetGoals;
 using Lorcaire.Application.Goals.Persistence;
 using Lorcaire.Application.Projects.CreateProject;
 using Lorcaire.Application.Projects.GetProjects;
 using Lorcaire.Application.Projects.Persistence;
+using Lorcaire.Application.Resources.CreateResource;
+using Lorcaire.Application.Resources.GetResources;
+using Lorcaire.Application.Resources.Persistence;
 using Lorcaire.Application.Tasks.ChangeTaskStatus;
 using Lorcaire.Application.Tasks.CreateTask;
 using Lorcaire.Application.Tasks.GetTasks;
@@ -44,6 +50,21 @@ public static class DependencyInjection
         services.AddSingleton(workspaceContext);
         services.AddSingleton(connectionFactory);
 
+        services.AddSingleton<SqliteCalendarEventRepository>();
+
+        services.AddSingleton<ICalendarEventRepository>(
+            provider =>
+                provider.GetRequiredService<
+                    SqliteCalendarEventRepository>());
+
+        services.AddSingleton<ICalendarEventReader>(
+            provider =>
+                provider.GetRequiredService<
+                    SqliteCalendarEventRepository>());
+
+        services.AddTransient<CreateCalendarEventHandler>();
+        services.AddTransient<GetCalendarEventsHandler>();
+
         services.AddSingleton<
             IAreaRepository,
             SqliteAreaRepository>();
@@ -77,6 +98,21 @@ public static class DependencyInjection
 
         services.AddTransient<CreateProjectHandler>();
         services.AddTransient<GetProjectsHandler>();
+
+        services.AddSingleton<SqliteResourceRepository>();
+
+        services.AddSingleton<IResourceRepository>(
+            provider =>
+                provider.GetRequiredService<
+                    SqliteResourceRepository>());
+
+        services.AddSingleton<IResourceReader>(
+            provider =>
+                provider.GetRequiredService<
+                    SqliteResourceRepository>());
+
+        services.AddTransient<CreateResourceHandler>();
+        services.AddTransient<GetResourcesHandler>();
 
         services.AddSingleton<SqliteTaskRepository>();
 

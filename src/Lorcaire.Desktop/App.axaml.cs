@@ -1,10 +1,14 @@
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Lorcaire.Application;
+using Lorcaire.Application.Calendar.CreateCalendarEvent;
+using Lorcaire.Application.Calendar.GetCalendarEvents;
 using Lorcaire.Application.Goals.CreateGoal;
 using Lorcaire.Application.Goals.GetGoals;
 using Lorcaire.Application.Projects.CreateProject;
 using Lorcaire.Application.Projects.GetProjects;
+using Lorcaire.Application.Resources.CreateResource;
+using Lorcaire.Application.Resources.GetResources;
 using Lorcaire.Application.Tasks.ChangeTaskStatus;
 using Lorcaire.Application.Tasks.CreateTask;
 using Lorcaire.Application.Tasks.GetTasks;
@@ -26,6 +30,12 @@ public partial class App : Avalonia.Application
         if (ApplicationLifetime
             is IClassicDesktopStyleApplicationLifetime desktop)
         {
+            var createEventHandler =
+                Services.GetRequiredService<CreateCalendarEventHandler>();
+
+            var getEventsHandler =
+                Services.GetRequiredService<GetCalendarEventsHandler>();
+
             var createGoalHandler =
                 Services.GetRequiredService<CreateGoalHandler>();
 
@@ -37,6 +47,12 @@ public partial class App : Avalonia.Application
 
             var getProjectsHandler =
                 Services.GetRequiredService<GetProjectsHandler>();
+
+            var createResourceHandler =
+                Services.GetRequiredService<CreateResourceHandler>();
+
+            var getResourcesHandler =
+                Services.GetRequiredService<GetResourcesHandler>();
 
             var createTaskHandler =
                 Services.GetRequiredService<CreateTaskHandler>();
@@ -54,10 +70,14 @@ public partial class App : Avalonia.Application
                 Services.GetRequiredService<WorkspaceContext>();
 
             desktop.MainWindow = new MainWindow(
+                createEventHandler,
+                getEventsHandler,
                 createGoalHandler,
                 getGoalsHandler,
                 createProjectHandler,
                 getProjectsHandler,
+                createResourceHandler,
+                getResourcesHandler,
                 createTaskHandler,
                 getTasksHandler,
                 completeTaskHandler,

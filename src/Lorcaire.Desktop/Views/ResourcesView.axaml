@@ -1,0 +1,91 @@
+<UserControl
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:resources="clr-namespace:Lorcaire.Application.Resources.GetResources;assembly=Lorcaire.Application"
+    x:Class="Lorcaire.Desktop.Views.ResourcesView">
+
+  <Grid RowDefinitions="Auto,Auto,*" RowSpacing="22">
+    <Border
+        Grid.Row="0"
+        Padding="24"
+        Background="#0F151B"
+        BorderBrush="#252D36"
+        BorderThickness="1"
+        CornerRadius="10">
+      <StackPanel Spacing="14">
+        <TextBlock
+            Text="Create a resource"
+            Foreground="White"
+            FontSize="20"
+            FontWeight="SemiBold"/>
+        <TextBox
+            x:Name="ResourceName"
+            PlaceholderText="Resource name"
+            MaxLength="200"/>
+        <TextBox
+            x:Name="ResourceCategory"
+            PlaceholderText="Category (for example: Book, Course, Tool)"
+            MaxLength="100"/>
+        <TextBox
+            x:Name="ResourceDescription"
+            PlaceholderText="Description (optional)"
+            AcceptsReturn="True"
+            TextWrapping="Wrap"
+            MinHeight="80"
+            MaxLength="1000"/>
+        <Button
+            x:Name="CreateResourceButton"
+            Content="Create resource"
+            Click="CreateResource"
+            HorizontalAlignment="Left"
+            Padding="22,10"
+            Background="#E8B04A"
+            Foreground="#080C11"/>
+        <TextBlock
+            x:Name="OperationMessage"
+            Foreground="#929AA5"
+            TextWrapping="Wrap"/>
+      </StackPanel>
+    </Border>
+
+    <TextBlock
+        Grid.Row="1"
+        Text="Your resources"
+        Foreground="White"
+        FontSize="20"
+        FontWeight="SemiBold"/>
+
+    <ScrollViewer Grid.Row="2">
+      <ItemsControl x:Name="ResourcesList">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="resources:ResourceSummary">
+            <Border
+                Margin="0,0,0,12"
+                Padding="20"
+                Background="#0F151B"
+                BorderBrush="#252D36"
+                BorderThickness="1"
+                CornerRadius="10">
+              <StackPanel Spacing="7">
+                <TextBlock
+                    Text="{Binding Category}"
+                    Foreground="#E8B04A"
+                    FontSize="12"
+                    FontWeight="SemiBold"/>
+                <TextBlock
+                    Text="{Binding Name}"
+                    Foreground="White"
+                    FontSize="17"
+                    FontWeight="SemiBold"/>
+                <TextBlock
+                    Text="{Binding Description}"
+                    Foreground="#929AA5"
+                    TextWrapping="Wrap"/>
+              </StackPanel>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </ScrollViewer>
+  </Grid>
+</UserControl>

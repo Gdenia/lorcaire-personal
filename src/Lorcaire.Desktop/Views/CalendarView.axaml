@@ -1,0 +1,129 @@
+<UserControl
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:calendar="clr-namespace:Lorcaire.Application.Calendar.GetCalendarEvents;assembly=Lorcaire.Application"
+    x:Class="Lorcaire.Desktop.Views.CalendarView">
+
+  <Grid RowDefinitions="Auto,Auto,*" RowSpacing="22">
+    <Border
+        Grid.Row="0"
+        Padding="24"
+        Background="#0F151B"
+        BorderBrush="#252D36"
+        BorderThickness="1"
+        CornerRadius="10">
+      <StackPanel Spacing="14">
+        <TextBlock
+            Text="Create an event"
+            Foreground="White"
+            FontSize="20"
+            FontWeight="SemiBold"/>
+        <TextBox
+            x:Name="EventTitle"
+            PlaceholderText="Event title"
+            MaxLength="200"/>
+        <TextBox
+            x:Name="EventDescription"
+            PlaceholderText="Description (optional)"
+            AcceptsReturn="True"
+            TextWrapping="Wrap"
+            MinHeight="70"
+            MaxLength="1000"/>
+
+        <TextBlock Text="Starts" Foreground="#E8B04A"/>
+        <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+          <CalendarDatePicker
+              x:Name="StartDate"
+              Grid.Column="0"
+              HorizontalAlignment="Stretch"/>
+          <TimePicker
+              x:Name="StartTime"
+              Grid.Column="1"
+              HorizontalAlignment="Stretch"/>
+        </Grid>
+
+        <CheckBox
+            x:Name="HasEndTime"
+            Content="Include end date and time"
+            Foreground="#D5D9DE"/>
+        <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+          <CalendarDatePicker
+              x:Name="EndDate"
+              Grid.Column="0"
+              HorizontalAlignment="Stretch"/>
+          <TimePicker
+              x:Name="EndTime"
+              Grid.Column="1"
+              HorizontalAlignment="Stretch"/>
+        </Grid>
+
+        <Button
+            x:Name="CreateEventButton"
+            Content="Create event"
+            Click="CreateEvent"
+            HorizontalAlignment="Left"
+            Padding="22,10"
+            Background="#E8B04A"
+            Foreground="#080C11"/>
+        <TextBlock
+            x:Name="OperationMessage"
+            Foreground="#929AA5"
+            TextWrapping="Wrap"/>
+      </StackPanel>
+    </Border>
+
+    <TextBlock
+        Grid.Row="1"
+        Text="Your events"
+        Foreground="White"
+        FontSize="20"
+        FontWeight="SemiBold"/>
+
+    <ScrollViewer Grid.Row="2">
+      <ItemsControl x:Name="EventsList">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="calendar:CalendarEventSummary">
+            <Border
+                Margin="0,0,0,12"
+                Padding="20"
+                Background="#0F151B"
+                BorderBrush="#252D36"
+                BorderThickness="1"
+                CornerRadius="10">
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="18">
+                <StackPanel Spacing="7">
+                  <TextBlock
+                      Text="{Binding Title}"
+                      Foreground="White"
+                      FontSize="17"
+                      FontWeight="SemiBold"/>
+                  <TextBlock
+                      Text="{Binding Schedule}"
+                      Foreground="#E8B04A"/>
+                  <TextBlock
+                      Text="{Binding Description}"
+                      Foreground="#929AA5"
+                      TextWrapping="Wrap"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                  <TextBlock
+                      Text="UPCOMING"
+                      Foreground="#E8B04A"
+                      FontSize="11"
+                      FontWeight="SemiBold"
+                      IsVisible="{Binding !IsPast}"/>
+                  <TextBlock
+                      Text="PAST"
+                      Foreground="#737D88"
+                      FontSize="11"
+                      FontWeight="SemiBold"
+                      IsVisible="{Binding IsPast}"/>
+                </StackPanel>
+              </Grid>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </ScrollViewer>
+  </Grid>
+</UserControl>

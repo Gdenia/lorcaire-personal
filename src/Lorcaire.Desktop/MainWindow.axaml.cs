@@ -1,10 +1,14 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Lorcaire.Application;
+using Lorcaire.Application.Calendar.CreateCalendarEvent;
+using Lorcaire.Application.Calendar.GetCalendarEvents;
 using Lorcaire.Application.Goals.CreateGoal;
 using Lorcaire.Application.Goals.GetGoals;
 using Lorcaire.Application.Projects.CreateProject;
 using Lorcaire.Application.Projects.GetProjects;
+using Lorcaire.Application.Resources.CreateResource;
+using Lorcaire.Application.Resources.GetResources;
 using Lorcaire.Application.Tasks.ChangeTaskStatus;
 using Lorcaire.Application.Tasks.CreateTask;
 using Lorcaire.Application.Tasks.GetTasks;
@@ -16,9 +20,13 @@ namespace Lorcaire.Desktop;
 public partial class MainWindow : Window
 {
     private readonly CreateGoalHandler _createGoalHandler;
+    private readonly CreateCalendarEventHandler _createEventHandler;
+    private readonly GetCalendarEventsHandler _getEventsHandler;
     private readonly GetGoalsHandler _getGoalsHandler;
     private readonly CreateProjectHandler _createProjectHandler;
     private readonly GetProjectsHandler _getProjectsHandler;
+    private readonly CreateResourceHandler _createResourceHandler;
+    private readonly GetResourcesHandler _getResourcesHandler;
     private readonly CreateTaskHandler _createTaskHandler;
     private readonly GetTasksHandler _getTasksHandler;
     private readonly CompleteTaskHandler _completeTaskHandler;
@@ -29,10 +37,14 @@ public partial class MainWindow : Window
     // mediante su recurso XAML.
     public MainWindow()
         : this(
+            App.Services.GetRequiredService<CreateCalendarEventHandler>(),
+            App.Services.GetRequiredService<GetCalendarEventsHandler>(),
             App.Services.GetRequiredService<CreateGoalHandler>(),
             App.Services.GetRequiredService<GetGoalsHandler>(),
             App.Services.GetRequiredService<CreateProjectHandler>(),
             App.Services.GetRequiredService<GetProjectsHandler>(),
+            App.Services.GetRequiredService<CreateResourceHandler>(),
+            App.Services.GetRequiredService<GetResourcesHandler>(),
             App.Services.GetRequiredService<CreateTaskHandler>(),
             App.Services.GetRequiredService<GetTasksHandler>(),
             App.Services.GetRequiredService<CompleteTaskHandler>(),
@@ -43,30 +55,42 @@ public partial class MainWindow : Window
 
     // Constructor principal con dependencias explícitas.
     public MainWindow(
+        CreateCalendarEventHandler createEventHandler,
+        GetCalendarEventsHandler getEventsHandler,
         CreateGoalHandler createGoalHandler,
         GetGoalsHandler getGoalsHandler,
         CreateProjectHandler createProjectHandler,
         GetProjectsHandler getProjectsHandler,
+        CreateResourceHandler createResourceHandler,
+        GetResourcesHandler getResourcesHandler,
         CreateTaskHandler createTaskHandler,
         GetTasksHandler getTasksHandler,
         CompleteTaskHandler completeTaskHandler,
         ReopenTaskHandler reopenTaskHandler,
         WorkspaceContext workspaceContext)
     {
+        ArgumentNullException.ThrowIfNull(createEventHandler);
+        ArgumentNullException.ThrowIfNull(getEventsHandler);
         ArgumentNullException.ThrowIfNull(createGoalHandler);
         ArgumentNullException.ThrowIfNull(getGoalsHandler);
         ArgumentNullException.ThrowIfNull(createProjectHandler);
         ArgumentNullException.ThrowIfNull(getProjectsHandler);
+        ArgumentNullException.ThrowIfNull(createResourceHandler);
+        ArgumentNullException.ThrowIfNull(getResourcesHandler);
         ArgumentNullException.ThrowIfNull(createTaskHandler);
         ArgumentNullException.ThrowIfNull(getTasksHandler);
         ArgumentNullException.ThrowIfNull(completeTaskHandler);
         ArgumentNullException.ThrowIfNull(reopenTaskHandler);
         ArgumentNullException.ThrowIfNull(workspaceContext);
 
+        _createEventHandler = createEventHandler;
+        _getEventsHandler = getEventsHandler;
         _createGoalHandler = createGoalHandler;
         _getGoalsHandler = getGoalsHandler;
         _createProjectHandler = createProjectHandler;
         _getProjectsHandler = getProjectsHandler;
+        _createResourceHandler = createResourceHandler;
+        _getResourcesHandler = getResourcesHandler;
         _createTaskHandler = createTaskHandler;
         _getTasksHandler = getTasksHandler;
         _completeTaskHandler = completeTaskHandler;
@@ -131,7 +155,12 @@ public partial class MainWindow : Window
         RoutedEventArgs e)
     {
         SetActiveNavigation(ResourcesButton);
-        ShowPlaceholder("Resources");
+        PageTitle.Text = "Resources";
+
+        PageContent.Content = new ResourcesView(
+            _createResourceHandler,
+            _getResourcesHandler,
+            _workspaceContext);
     }
 
     private void ShowCalendar(
@@ -139,7 +168,12 @@ public partial class MainWindow : Window
         RoutedEventArgs e)
     {
         SetActiveNavigation(CalendarButton);
-        ShowPlaceholder("Calendar");
+        PageTitle.Text = "Calendar";
+
+        PageContent.Content = new CalendarView(
+            _createEventHandler,
+            _getEventsHandler,
+            _workspaceContext);
     }
 
     private void ShowNotes(
