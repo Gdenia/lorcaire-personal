@@ -4,102 +4,61 @@
     xmlns:goals="clr-namespace:Lorcaire.Application.Goals.GetGoals;assembly=Lorcaire.Application"
     x:Class="Lorcaire.Desktop.Views.GoalsView">
 
-  <Grid
-      RowDefinitions="Auto,Auto,*"
-      RowSpacing="22">
-
-    <Border
-        Grid.Row="0"
-        Padding="24"
-        Background="#0F151B"
-        BorderBrush="#252D36"
-        BorderThickness="1"
-        CornerRadius="10">
-
+  <Grid RowDefinitions="Auto,Auto,Auto,*" RowSpacing="22">
+    <Border Grid.Row="0" Padding="24" Background="#0F151B" BorderBrush="#252D36" BorderThickness="1" CornerRadius="10">
       <StackPanel Spacing="14">
-
-        <TextBlock
-            Text="Create a goal"
-            Foreground="White"
-            FontSize="20"
-            FontWeight="SemiBold"/>
-
-        <TextBox
-            x:Name="GoalName"
-            PlaceholderText="Desired result"
-            MaxLength="200"/>
-
-        <TextBox
-            x:Name="GoalDescription"
-            PlaceholderText="Description (optional)"
-            AcceptsReturn="True"
-            TextWrapping="Wrap"
-            MinHeight="80"
-            MaxLength="1000"/>
-
-        <Button
-            x:Name="CreateGoalButton"
-            Content="Create goal"
-            Click="CreateGoal"
-            HorizontalAlignment="Left"
-            Padding="22,10"
-            Background="#E8B04A"
-            Foreground="#080C11"/>
-
-        <TextBlock
-            x:Name="OperationMessage"
-            Foreground="#929AA5"
-            TextWrapping="Wrap"/>
-
+        <TextBlock x:Name="FormTitle" Text="Create a goal" Foreground="White" FontSize="20" FontWeight="SemiBold"/>
+        <TextBox x:Name="GoalName" PlaceholderText="Desired result" MaxLength="200"/>
+        <TextBox x:Name="GoalDescription" PlaceholderText="Description (optional)" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="80" MaxLength="1000"/>
+        <StackPanel Orientation="Horizontal" Spacing="10">
+          <Button x:Name="CreateGoalButton" Content="Create goal" Click="CreateGoal" Padding="22,10" Background="#E8B04A" Foreground="#080C11"/>
+          <Button x:Name="SaveGoalButton" Content="Save changes" Click="SaveGoal" IsVisible="False" Padding="22,10" Background="#E8B04A" Foreground="#080C11"/>
+          <Button x:Name="CancelEditButton" Content="Cancel" Click="CancelEdit" IsVisible="False" Padding="22,10" Background="#20262D" Foreground="White"/>
+        </StackPanel>
+        <TextBlock x:Name="OperationMessage" Foreground="#929AA5" TextWrapping="Wrap"/>
       </StackPanel>
     </Border>
 
-    <TextBlock
-        Grid.Row="1"
-        Text="Your goals"
-        Foreground="White"
-        FontSize="20"
-        FontWeight="SemiBold"/>
+    <TextBlock Grid.Row="1" Text="Your goals" Foreground="White" FontSize="20" FontWeight="SemiBold"/>
 
-    <ScrollViewer Grid.Row="2">
+    <Border x:Name="DeleteConfirmation" Grid.Row="2" IsVisible="False" Padding="18" Background="#25171A" BorderBrush="#6A3038" BorderThickness="1" CornerRadius="10">
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+        <StackPanel Spacing="5">
+          <TextBlock x:Name="DeleteConfirmationTitle" Text="Delete this goal?" Foreground="White" FontSize="17" FontWeight="SemiBold"/>
+          <TextBlock Text="This action cannot be undone." Foreground="#D8A0A6"/>
+        </StackPanel>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+          <Button Content="Confirm delete" Click="ConfirmDelete" Padding="16,9" Background="#A63D49" Foreground="White"/>
+          <Button Content="Cancel" Click="CancelDelete" Padding="16,9" Background="#20262D" Foreground="White"/>
+        </StackPanel>
+      </Grid>
+    </Border>
 
-      <ItemsControl x:Name="GoalsList">
-
-        <ItemsControl.ItemTemplate>
-
-          <DataTemplate x:DataType="goals:GoalSummary">
-
-            <Border
-                Margin="0,0,0,12"
-                Padding="20"
-                Background="#0F151B"
-                BorderBrush="#252D36"
-                BorderThickness="1"
-                CornerRadius="10">
-
-              <StackPanel Spacing="7">
-
-                <TextBlock
-                    Text="{Binding Name}"
-                    Foreground="White"
-                    FontSize="17"
-                    FontWeight="SemiBold"/>
-
-                <TextBlock
-                    Text="{Binding Description}"
-                    Foreground="#929AA5"
-                    TextWrapping="Wrap"/>
-
-              </StackPanel>
-            </Border>
-
-          </DataTemplate>
-
-        </ItemsControl.ItemTemplate>
-
-      </ItemsControl>
-
-    </ScrollViewer>
-
+    <Grid Grid.Row="3">
+      <TextBlock x:Name="EmptyState" Text="You have not created any goals yet." Foreground="#929AA5" IsVisible="False"/>
+      <ScrollViewer>
+        <ItemsControl x:Name="GoalsList">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="goals:GoalSummary">
+              <Border Margin="0,0,0,12" Padding="20" Background="#0F151B" BorderBrush="#252D36" BorderThickness="1" CornerRadius="10">
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="18">
+                  <StackPanel Spacing="7">
+                    <TextBlock Text="{Binding Name}" Foreground="White" FontSize="17" FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding Description}" Foreground="#929AA5" TextWrapping="Wrap"/>
+                    <TextBlock Text="Completed" Foreground="#69C58D" IsVisible="{Binding IsCompleted}" FontWeight="SemiBold"/>
+                  </StackPanel>
+                  <WrapPanel Grid.Column="1" VerticalAlignment="Center">
+                    <Button Content="Complete" Tag="{Binding Id}" Click="CompleteGoal" IsVisible="{Binding !IsCompleted}" Margin="0,0,8,8" Padding="14,8" Background="#E8B04A" Foreground="#080C11"/>
+                    <Button Content="Reopen" Tag="{Binding Id}" Click="ReopenGoal" IsVisible="{Binding IsCompleted}" Margin="0,0,8,8" Padding="14,8" Background="#20262D" Foreground="#E8B04A"/>
+                    <Button Content="Edit" Tag="{Binding Id}" Click="BeginEdit" Margin="0,0,8,8" Padding="14,8" Background="#20262D" Foreground="White"/>
+                    <Button Content="Delete" Tag="{Binding Id}" Click="DeleteGoal" Margin="0,0,0,8" Padding="14,8" Background="#3A2024" Foreground="#F2A0A7"/>
+                  </WrapPanel>
+                </Grid>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+    </Grid>
   </Grid>
 </UserControl>

@@ -129,5 +129,20 @@ public sealed class CreateGoalHandlerTests
 
             return Task.CompletedTask;
         }
+
+        public Task<Goal?> GetByIdAsync(
+            GoalId goalId,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult(Goals.SingleOrDefault(goal => goal.Id == goalId));
+
+        public Task UpdateAsync(
+            Goal goal,
+            CancellationToken cancellationToken = default) =>
+            Task.CompletedTask;
+
+        public Task<bool> DeleteAsync(
+            GoalId goalId,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult(Goals.RemoveAll(goal => goal.Id == goalId) == 1);
     }
 }

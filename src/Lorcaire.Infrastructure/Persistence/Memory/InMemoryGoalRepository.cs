@@ -37,4 +37,38 @@ public sealed class InMemoryGoalRepository :
 
         return Task.FromResult(goals);
     }
+
+    public Task<Goal?> GetByIdAsync(
+        GoalId goalId,
+        CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        _goals.TryGetValue(goalId, out var goal);
+        return Task.FromResult(goal);
+    }
+
+    public Task UpdateAsync(
+        Goal goal,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(goal);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        if (!_goals.TryGetValue(goal.Id, out _))
+        {
+            throw new InvalidOperationException(
+                $"No existe un objetivo con identificador '{goal.Id}'.");
+        }
+
+        _goals[goal.Id] = goal;
+        return Task.CompletedTask;
+    }
+
+    public Task<bool> DeleteAsync(
+        GoalId goalId,
+        CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        return Task.FromResult(_goals.TryRemove(goalId, out _));
+    }
 }

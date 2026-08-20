@@ -4,8 +4,11 @@ using Lorcaire.Application.Calendar.GetCalendarEvents;
 using Lorcaire.Application.Calendar.Persistence;
 using Lorcaire.Application.Dashboard;
 using Lorcaire.Application.Goals.CreateGoal;
+using Lorcaire.Application.Goals.ChangeGoalStatus;
+using Lorcaire.Application.Goals.DeleteGoal;
 using Lorcaire.Application.Goals.GetGoals;
 using Lorcaire.Application.Goals.Persistence;
+using Lorcaire.Application.Goals.UpdateGoal;
 using Lorcaire.Application.Notes.CreateNote;
 using Lorcaire.Application.Notes.GetNotes;
 using Lorcaire.Application.Notes.Persistence;
@@ -103,6 +106,10 @@ public static class DependencyInjection
 
         services.AddTransient<CreateGoalHandler>();
         services.AddTransient<GetGoalsHandler>();
+        services.AddTransient<UpdateGoalHandler>();
+        services.AddTransient<DeleteGoalHandler>();
+        services.AddTransient<CompleteGoalHandler>();
+        services.AddTransient<ReopenGoalHandler>();
 
         services.AddSingleton<SqliteNoteRepository>();
 

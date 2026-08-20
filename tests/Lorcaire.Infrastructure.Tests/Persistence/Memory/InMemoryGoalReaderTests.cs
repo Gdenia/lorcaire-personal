@@ -32,4 +32,35 @@ public sealed class InMemoryGoalReaderTests
             goal => Assert.Equal("Primer objetivo", goal.Name),
             goal => Assert.Equal("Segundo objetivo", goal.Name));
     }
+
+    [Fact]
+    public async Task Repository_UpdatesAndDeletesGoal()
+    {
+        var repository = new InMemoryGoalRepository();
+        var goal = new Goal(GoalId.New(), AreaId.New(), "Original");
+        await repository.AddAsync(goal);
+
+        goal.Rename("Updated");
+        goal.Complete();
+        await repository.UpdateAsync(goal);
+
+        var stored = await repository.GetByIdAsync(goal.Id);
+        Assert.NotNull(stored);
+        Assert.Equal("Updated", stored.Name);
+        Assert.True(stored.IsCompleted);
+
+        Assert.True(await repository.DeleteAsync(goal.Id));
+        Assert.False(await repository.DeleteAsync(goal.Id));
+        Assert.Null(await repository.GetByIdAsync(goal.Id));
+    }
+
+    [Fact]
+    public async Task UpdateAsync_RejectsMissingGoal()
+    {
+        var repository = new InMemoryGoalRepository();
+        var goal = new Goal(GoalId.New(), AreaId.New(), "Missing");
+
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () => repository.UpdateAsync(goal));
+    }
 }

@@ -5,7 +5,10 @@ using Lorcaire.Application.Calendar.CreateCalendarEvent;
 using Lorcaire.Application.Calendar.GetCalendarEvents;
 using Lorcaire.Application.Dashboard;
 using Lorcaire.Application.Goals.CreateGoal;
+using Lorcaire.Application.Goals.ChangeGoalStatus;
+using Lorcaire.Application.Goals.DeleteGoal;
 using Lorcaire.Application.Goals.GetGoals;
+using Lorcaire.Application.Goals.UpdateGoal;
 using Lorcaire.Application.Notes.CreateNote;
 using Lorcaire.Application.Notes.GetNotes;
 using Lorcaire.Application.Notes.UpdateNote;
@@ -26,6 +29,10 @@ public partial class MainWindow : Window
 {
     private readonly GetDashboardHandler _getDashboardHandler;
     private readonly CreateGoalHandler _createGoalHandler;
+    private readonly UpdateGoalHandler _updateGoalHandler;
+    private readonly DeleteGoalHandler _deleteGoalHandler;
+    private readonly CompleteGoalHandler _completeGoalHandler;
+    private readonly ReopenGoalHandler _reopenGoalHandler;
     private readonly CreateCalendarEventHandler _createEventHandler;
     private readonly GetCalendarEventsHandler _getEventsHandler;
     private readonly GetGoalsHandler _getGoalsHandler;
@@ -53,6 +60,10 @@ public partial class MainWindow : Window
             App.Services.GetRequiredService<GetCalendarEventsHandler>(),
             App.Services.GetRequiredService<CreateGoalHandler>(),
             App.Services.GetRequiredService<GetGoalsHandler>(),
+            App.Services.GetRequiredService<UpdateGoalHandler>(),
+            App.Services.GetRequiredService<DeleteGoalHandler>(),
+            App.Services.GetRequiredService<CompleteGoalHandler>(),
+            App.Services.GetRequiredService<ReopenGoalHandler>(),
             App.Services.GetRequiredService<CreateNoteHandler>(),
             App.Services.GetRequiredService<GetNotesHandler>(),
             App.Services.GetRequiredService<UpdateNoteHandler>(),
@@ -77,6 +88,10 @@ public partial class MainWindow : Window
         GetCalendarEventsHandler getEventsHandler,
         CreateGoalHandler createGoalHandler,
         GetGoalsHandler getGoalsHandler,
+        UpdateGoalHandler updateGoalHandler,
+        DeleteGoalHandler deleteGoalHandler,
+        CompleteGoalHandler completeGoalHandler,
+        ReopenGoalHandler reopenGoalHandler,
         CreateNoteHandler createNoteHandler,
         GetNotesHandler getNotesHandler,
         UpdateNoteHandler updateNoteHandler,
@@ -97,6 +112,10 @@ public partial class MainWindow : Window
         ArgumentNullException.ThrowIfNull(getEventsHandler);
         ArgumentNullException.ThrowIfNull(createGoalHandler);
         ArgumentNullException.ThrowIfNull(getGoalsHandler);
+        ArgumentNullException.ThrowIfNull(updateGoalHandler);
+        ArgumentNullException.ThrowIfNull(deleteGoalHandler);
+        ArgumentNullException.ThrowIfNull(completeGoalHandler);
+        ArgumentNullException.ThrowIfNull(reopenGoalHandler);
         ArgumentNullException.ThrowIfNull(createNoteHandler);
         ArgumentNullException.ThrowIfNull(getNotesHandler);
         ArgumentNullException.ThrowIfNull(updateNoteHandler);
@@ -117,6 +136,10 @@ public partial class MainWindow : Window
         _getEventsHandler = getEventsHandler;
         _createGoalHandler = createGoalHandler;
         _getGoalsHandler = getGoalsHandler;
+        _updateGoalHandler = updateGoalHandler;
+        _deleteGoalHandler = deleteGoalHandler;
+        _completeGoalHandler = completeGoalHandler;
+        _reopenGoalHandler = reopenGoalHandler;
         _createNoteHandler = createNoteHandler;
         _getNotesHandler = getNotesHandler;
         _updateNoteHandler = updateNoteHandler;
@@ -160,6 +183,10 @@ public partial class MainWindow : Window
         PageContent.Content = new GoalsView(
             _createGoalHandler,
             _getGoalsHandler,
+            _updateGoalHandler,
+            _deleteGoalHandler,
+            _completeGoalHandler,
+            _reopenGoalHandler,
             _workspaceContext);
     }
 

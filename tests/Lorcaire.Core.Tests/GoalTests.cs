@@ -82,6 +82,18 @@ public sealed class GoalTests
     }
 
     [Fact]
+    public void Editing_DoesNotChangeCompletionState()
+    {
+        var goal = CreateGoal();
+        goal.Complete();
+
+        goal.Rename("Edited goal");
+        goal.ChangeDescription("Edited description");
+
+        Assert.True(goal.IsCompleted);
+    }
+
+    [Fact]
     public void GoalId_RejectsEmptyGuid()
     {
         Assert.Throws<ArgumentException>(() =>

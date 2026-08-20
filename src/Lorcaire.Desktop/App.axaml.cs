@@ -5,7 +5,10 @@ using Lorcaire.Application.Calendar.CreateCalendarEvent;
 using Lorcaire.Application.Calendar.GetCalendarEvents;
 using Lorcaire.Application.Dashboard;
 using Lorcaire.Application.Goals.CreateGoal;
+using Lorcaire.Application.Goals.ChangeGoalStatus;
+using Lorcaire.Application.Goals.DeleteGoal;
 using Lorcaire.Application.Goals.GetGoals;
+using Lorcaire.Application.Goals.UpdateGoal;
 using Lorcaire.Application.Notes.CreateNote;
 using Lorcaire.Application.Notes.GetNotes;
 using Lorcaire.Application.Notes.UpdateNote;
@@ -49,6 +52,18 @@ public partial class App : Avalonia.Application
 
             var getGoalsHandler =
                 Services.GetRequiredService<GetGoalsHandler>();
+
+            var updateGoalHandler =
+                Services.GetRequiredService<UpdateGoalHandler>();
+
+            var deleteGoalHandler =
+                Services.GetRequiredService<DeleteGoalHandler>();
+
+            var completeGoalHandler =
+                Services.GetRequiredService<CompleteGoalHandler>();
+
+            var reopenGoalHandler =
+                Services.GetRequiredService<ReopenGoalHandler>();
 
             var createNoteHandler =
                 Services.GetRequiredService<CreateNoteHandler>();
@@ -98,6 +113,10 @@ public partial class App : Avalonia.Application
                 getEventsHandler,
                 createGoalHandler,
                 getGoalsHandler,
+                updateGoalHandler,
+                deleteGoalHandler,
+                completeGoalHandler,
+                reopenGoalHandler,
                 createNoteHandler,
                 getNotesHandler,
                 updateNoteHandler,
