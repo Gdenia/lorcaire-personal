@@ -12,6 +12,7 @@ using Lorcaire.Application.Projects.CreateProject;
 using Lorcaire.Application.Projects.GetProjects;
 using Lorcaire.Application.Resources.CreateResource;
 using Lorcaire.Application.Resources.GetResources;
+using Lorcaire.Application.Settings;
 using Lorcaire.Application.Tasks.ChangeTaskStatus;
 using Lorcaire.Application.Tasks.CreateTask;
 using Lorcaire.Application.Tasks.GetTasks;
@@ -66,6 +67,12 @@ public partial class App : Avalonia.Application
             var getResourcesHandler =
                 Services.GetRequiredService<GetResourcesHandler>();
 
+            var getPreferencesHandler =
+                Services.GetRequiredService<GetUserPreferencesHandler>();
+
+            var savePreferencesHandler =
+                Services.GetRequiredService<SaveUserPreferencesHandler>();
+
             var createTaskHandler =
                 Services.GetRequiredService<CreateTaskHandler>();
 
@@ -93,6 +100,8 @@ public partial class App : Avalonia.Application
                 getProjectsHandler,
                 createResourceHandler,
                 getResourcesHandler,
+                getPreferencesHandler,
+                savePreferencesHandler,
                 createTaskHandler,
                 getTasksHandler,
                 completeTaskHandler,

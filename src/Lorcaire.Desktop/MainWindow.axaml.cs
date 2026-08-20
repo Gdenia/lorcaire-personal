@@ -12,6 +12,7 @@ using Lorcaire.Application.Projects.CreateProject;
 using Lorcaire.Application.Projects.GetProjects;
 using Lorcaire.Application.Resources.CreateResource;
 using Lorcaire.Application.Resources.GetResources;
+using Lorcaire.Application.Settings;
 using Lorcaire.Application.Tasks.ChangeTaskStatus;
 using Lorcaire.Application.Tasks.CreateTask;
 using Lorcaire.Application.Tasks.GetTasks;
@@ -33,6 +34,8 @@ public partial class MainWindow : Window
     private readonly GetProjectsHandler _getProjectsHandler;
     private readonly CreateResourceHandler _createResourceHandler;
     private readonly GetResourcesHandler _getResourcesHandler;
+    private readonly GetUserPreferencesHandler _getPreferencesHandler;
+    private readonly SaveUserPreferencesHandler _savePreferencesHandler;
     private readonly CreateTaskHandler _createTaskHandler;
     private readonly GetTasksHandler _getTasksHandler;
     private readonly CompleteTaskHandler _completeTaskHandler;
@@ -54,6 +57,8 @@ public partial class MainWindow : Window
             App.Services.GetRequiredService<GetProjectsHandler>(),
             App.Services.GetRequiredService<CreateResourceHandler>(),
             App.Services.GetRequiredService<GetResourcesHandler>(),
+            App.Services.GetRequiredService<GetUserPreferencesHandler>(),
+            App.Services.GetRequiredService<SaveUserPreferencesHandler>(),
             App.Services.GetRequiredService<CreateTaskHandler>(),
             App.Services.GetRequiredService<GetTasksHandler>(),
             App.Services.GetRequiredService<CompleteTaskHandler>(),
@@ -75,6 +80,8 @@ public partial class MainWindow : Window
         GetProjectsHandler getProjectsHandler,
         CreateResourceHandler createResourceHandler,
         GetResourcesHandler getResourcesHandler,
+        GetUserPreferencesHandler getPreferencesHandler,
+        SaveUserPreferencesHandler savePreferencesHandler,
         CreateTaskHandler createTaskHandler,
         GetTasksHandler getTasksHandler,
         CompleteTaskHandler completeTaskHandler,
@@ -92,6 +99,8 @@ public partial class MainWindow : Window
         ArgumentNullException.ThrowIfNull(getProjectsHandler);
         ArgumentNullException.ThrowIfNull(createResourceHandler);
         ArgumentNullException.ThrowIfNull(getResourcesHandler);
+        ArgumentNullException.ThrowIfNull(getPreferencesHandler);
+        ArgumentNullException.ThrowIfNull(savePreferencesHandler);
         ArgumentNullException.ThrowIfNull(createTaskHandler);
         ArgumentNullException.ThrowIfNull(getTasksHandler);
         ArgumentNullException.ThrowIfNull(completeTaskHandler);
@@ -109,6 +118,8 @@ public partial class MainWindow : Window
         _getProjectsHandler = getProjectsHandler;
         _createResourceHandler = createResourceHandler;
         _getResourcesHandler = getResourcesHandler;
+        _getPreferencesHandler = getPreferencesHandler;
+        _savePreferencesHandler = savePreferencesHandler;
         _createTaskHandler = createTaskHandler;
         _getTasksHandler = getTasksHandler;
         _completeTaskHandler = completeTaskHandler;
@@ -117,6 +128,7 @@ public partial class MainWindow : Window
 
         InitializeComponent();
 
+        Loaded += LoadPreferences;
         ShowDashboardView();
     }
 
@@ -165,6 +177,7 @@ public partial class MainWindow : Window
             _getTasksHandler,
             _completeTaskHandler,
             _reopenTaskHandler,
+            _getPreferencesHandler,
             _workspaceContext);
     }
 
@@ -213,7 +226,12 @@ public partial class MainWindow : Window
         RoutedEventArgs e)
     {
         SetActiveNavigation(SettingsButton);
-        ShowPlaceholder("Settings");
+        PageTitle.Text = "Settings";
+
+        PageContent.Content = new SettingsView(
+            _getPreferencesHandler,
+            _savePreferencesHandler,
+            ApplyPreferences);
     }
 
     private void ShowAbout(
@@ -229,6 +247,24 @@ public partial class MainWindow : Window
         SetActiveNavigation(DashboardButton);
         PageTitle.Text = "Dashboard";
         PageContent.Content = new DashboardView();
+    }
+
+    private async void LoadPreferences(object? sender, RoutedEventArgs e)
+    {
+        try
+        {
+            ApplyPreferences(await _getPreferencesHandler.HandleAsync());
+        }
+        catch
+        {
+            ApplyPreferences(UserPreferences.Default);
+        }
+    }
+
+    private void ApplyPreferences(UserPreferences preferences)
+    {
+        GreetingText.Text =
+            $"Good evening, {preferences.DisplayName}.";
     }
 
     private void SetActiveNavigation(Button activeButton)

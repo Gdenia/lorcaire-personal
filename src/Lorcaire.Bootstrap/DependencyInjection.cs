@@ -15,12 +15,14 @@ using Lorcaire.Application.Projects.Persistence;
 using Lorcaire.Application.Resources.CreateResource;
 using Lorcaire.Application.Resources.GetResources;
 using Lorcaire.Application.Resources.Persistence;
+using Lorcaire.Application.Settings;
 using Lorcaire.Application.Tasks.ChangeTaskStatus;
 using Lorcaire.Application.Tasks.CreateTask;
 using Lorcaire.Application.Tasks.GetTasks;
 using Lorcaire.Application.Tasks.Persistence;
 using Lorcaire.Core.Domain.Areas;
 using Lorcaire.Infrastructure.Persistence.Sqlite;
+using Lorcaire.Infrastructure.Settings;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Lorcaire.Bootstrap;
@@ -37,7 +39,13 @@ public static class DependencyInjection
         var workspaceContext =
             new WorkspaceContext(DefaultAreaId);
 
-        var databasePath = GetDatabasePath();
+        var personalDataPath = GetPersonalDataPath();
+        var databasePath = Path.Combine(
+            personalDataPath,
+            "lorcaire.db");
+        var settingsPath = Path.Combine(
+            personalDataPath,
+            "settings.json");
 
         var connectionFactory =
             new SqliteConnectionFactory(databasePath);
@@ -54,6 +62,11 @@ public static class DependencyInjection
         services.AddSingleton(workspaceContext);
         services.AddSingleton(connectionFactory);
         services.AddSingleton(TimeProvider.System);
+
+        services.AddSingleton<IUserPreferencesStore>(
+            new JsonUserPreferencesStore(settingsPath));
+        services.AddTransient<GetUserPreferencesHandler>();
+        services.AddTransient<SaveUserPreferencesHandler>();
 
         services.AddSingleton<SqliteCalendarEventRepository>();
 
@@ -155,7 +168,7 @@ public static class DependencyInjection
         return services.BuildServiceProvider();
     }
 
-    private static string GetDatabasePath()
+    private static string GetPersonalDataPath()
     {
         var localDataPath =
             Environment.GetFolderPath(
@@ -164,7 +177,6 @@ public static class DependencyInjection
         return Path.Combine(
             localDataPath,
             "Lorcaire",
-            "PersonalEdition",
-            "lorcaire.db");
+            "PersonalEdition");
     }
 }

@@ -4,6 +4,7 @@ using Lorcaire.Application;
 using Lorcaire.Application.Tasks.ChangeTaskStatus;
 using Lorcaire.Application.Tasks.CreateTask;
 using Lorcaire.Application.Tasks.GetTasks;
+using Lorcaire.Application.Settings;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Lorcaire.Desktop.Views;
@@ -14,6 +15,7 @@ public partial class TasksView : UserControl
     private readonly GetTasksHandler _getTasksHandler;
     private readonly CompleteTaskHandler _completeTaskHandler;
     private readonly ReopenTaskHandler _reopenTaskHandler;
+    private readonly GetUserPreferencesHandler _getPreferencesHandler;
     private readonly WorkspaceContext _workspaceContext;
 
     public TasksView()
@@ -22,6 +24,7 @@ public partial class TasksView : UserControl
             App.Services.GetRequiredService<GetTasksHandler>(),
             App.Services.GetRequiredService<CompleteTaskHandler>(),
             App.Services.GetRequiredService<ReopenTaskHandler>(),
+            App.Services.GetRequiredService<GetUserPreferencesHandler>(),
             App.Services.GetRequiredService<WorkspaceContext>())
     {
     }
@@ -31,18 +34,21 @@ public partial class TasksView : UserControl
         GetTasksHandler getTasksHandler,
         CompleteTaskHandler completeTaskHandler,
         ReopenTaskHandler reopenTaskHandler,
+        GetUserPreferencesHandler getPreferencesHandler,
         WorkspaceContext workspaceContext)
     {
         ArgumentNullException.ThrowIfNull(createTaskHandler);
         ArgumentNullException.ThrowIfNull(getTasksHandler);
         ArgumentNullException.ThrowIfNull(completeTaskHandler);
         ArgumentNullException.ThrowIfNull(reopenTaskHandler);
+        ArgumentNullException.ThrowIfNull(getPreferencesHandler);
         ArgumentNullException.ThrowIfNull(workspaceContext);
 
         _createTaskHandler = createTaskHandler;
         _getTasksHandler = getTasksHandler;
         _completeTaskHandler = completeTaskHandler;
         _reopenTaskHandler = reopenTaskHandler;
+        _getPreferencesHandler = getPreferencesHandler;
         _workspaceContext = workspaceContext;
 
         InitializeComponent();
@@ -141,6 +147,11 @@ public partial class TasksView : UserControl
 
     private async System.Threading.Tasks.Task RefreshTasksAsync()
     {
-        TasksList.ItemsSource = await _getTasksHandler.HandleAsync();
+        var tasks = await _getTasksHandler.HandleAsync();
+        var preferences = await _getPreferencesHandler.HandleAsync();
+
+        TasksList.ItemsSource = preferences.ShowCompletedTasks
+            ? tasks
+            : tasks.Where(task => !task.IsCompleted).ToArray();
     }
 }

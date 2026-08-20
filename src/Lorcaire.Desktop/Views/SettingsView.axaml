@@ -1,0 +1,103 @@
+<UserControl
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="Lorcaire.Desktop.Views.SettingsView">
+
+  <StackPanel Spacing="22">
+    <Border
+        Padding="24"
+        Background="#0F151B"
+        BorderBrush="#252D36"
+        BorderThickness="1"
+        CornerRadius="10">
+      <StackPanel Spacing="14">
+        <TextBlock
+            Text="General"
+            Foreground="White"
+            FontSize="20"
+            FontWeight="SemiBold"/>
+        <TextBlock
+            Text="Choose the name Lorcaire uses to greet you."
+            Foreground="#929AA5"/>
+        <TextBox
+            x:Name="DisplayName"
+            PlaceholderText="Display name"
+            MaxLength="100"/>
+      </StackPanel>
+    </Border>
+
+    <Border
+        Padding="24"
+        Background="#0F151B"
+        BorderBrush="#252D36"
+        BorderThickness="1"
+        CornerRadius="10">
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel Spacing="7">
+          <TextBlock
+              Text="Appearance"
+              Foreground="White"
+              FontSize="20"
+              FontWeight="SemiBold"/>
+          <TextBlock
+              Text="Theme"
+              Foreground="#D5D9DE"/>
+          <TextBlock
+              Text="Lorcaire currently uses its purpose-built dark theme."
+              Foreground="#929AA5"/>
+        </StackPanel>
+        <Border
+            Grid.Column="1"
+            Padding="16,8"
+            Background="#20262D"
+            CornerRadius="7"
+            VerticalAlignment="Center">
+          <TextBlock
+              Text="DARK"
+              Foreground="#E8B04A"
+              FontWeight="SemiBold"
+              LetterSpacing="1"/>
+        </Border>
+      </Grid>
+    </Border>
+
+    <Border
+        Padding="24"
+        Background="#0F151B"
+        BorderBrush="#252D36"
+        BorderThickness="1"
+        CornerRadius="10">
+      <StackPanel Spacing="14">
+        <TextBlock
+            Text="Behavior"
+            Foreground="White"
+            FontSize="20"
+            FontWeight="SemiBold"/>
+        <CheckBox
+            x:Name="ShowCompletedTasks"
+            Content="Show completed tasks in the Tasks list"
+            Foreground="#D5D9DE"/>
+        <TextBlock
+            Text="You can turn this back on whenever you need to reopen a completed task."
+            Foreground="#929AA5"
+            TextWrapping="Wrap"/>
+      </StackPanel>
+    </Border>
+
+    <Grid ColumnDefinitions="*,Auto">
+      <TextBlock
+          x:Name="OperationMessage"
+          Foreground="#929AA5"
+          VerticalAlignment="Center"
+          TextWrapping="Wrap"/>
+      <Button
+          x:Name="SaveSettingsButton"
+          Grid.Column="1"
+          Content="Save settings"
+          Click="SaveSettings"
+          Padding="22,10"
+          Background="#E8B04A"
+          Foreground="#080C11"/>
+    </Grid>
+  </StackPanel>
+</UserControl>
