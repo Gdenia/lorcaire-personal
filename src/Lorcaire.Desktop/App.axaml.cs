@@ -3,6 +3,7 @@ using Avalonia.Markup.Xaml;
 using Lorcaire.Application;
 using Lorcaire.Application.Calendar.CreateCalendarEvent;
 using Lorcaire.Application.Calendar.GetCalendarEvents;
+using Lorcaire.Application.Dashboard;
 using Lorcaire.Application.Goals.CreateGoal;
 using Lorcaire.Application.Goals.GetGoals;
 using Lorcaire.Application.Notes.CreateNote;
@@ -34,6 +35,9 @@ public partial class App : Avalonia.Application
         if (ApplicationLifetime
             is IClassicDesktopStyleApplicationLifetime desktop)
         {
+            var getDashboardHandler =
+                Services.GetRequiredService<GetDashboardHandler>();
+
             var createEventHandler =
                 Services.GetRequiredService<CreateCalendarEventHandler>();
 
@@ -89,6 +93,7 @@ public partial class App : Avalonia.Application
                 Services.GetRequiredService<WorkspaceContext>();
 
             desktop.MainWindow = new MainWindow(
+                getDashboardHandler,
                 createEventHandler,
                 getEventsHandler,
                 createGoalHandler,

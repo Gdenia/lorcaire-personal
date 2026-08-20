@@ -2,6 +2,7 @@ using Lorcaire.Application;
 using Lorcaire.Application.Calendar.CreateCalendarEvent;
 using Lorcaire.Application.Calendar.GetCalendarEvents;
 using Lorcaire.Application.Calendar.Persistence;
+using Lorcaire.Application.Dashboard;
 using Lorcaire.Application.Goals.CreateGoal;
 using Lorcaire.Application.Goals.GetGoals;
 using Lorcaire.Application.Goals.Persistence;
@@ -82,6 +83,7 @@ public static class DependencyInjection
 
         services.AddTransient<CreateCalendarEventHandler>();
         services.AddTransient<GetCalendarEventsHandler>();
+        services.AddTransient<GetDashboardHandler>();
 
         services.AddSingleton<
             IAreaRepository,

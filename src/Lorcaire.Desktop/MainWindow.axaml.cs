@@ -3,6 +3,7 @@ using Avalonia.Interactivity;
 using Lorcaire.Application;
 using Lorcaire.Application.Calendar.CreateCalendarEvent;
 using Lorcaire.Application.Calendar.GetCalendarEvents;
+using Lorcaire.Application.Dashboard;
 using Lorcaire.Application.Goals.CreateGoal;
 using Lorcaire.Application.Goals.GetGoals;
 using Lorcaire.Application.Notes.CreateNote;
@@ -23,6 +24,7 @@ namespace Lorcaire.Desktop;
 
 public partial class MainWindow : Window
 {
+    private readonly GetDashboardHandler _getDashboardHandler;
     private readonly CreateGoalHandler _createGoalHandler;
     private readonly CreateCalendarEventHandler _createEventHandler;
     private readonly GetCalendarEventsHandler _getEventsHandler;
@@ -46,6 +48,7 @@ public partial class MainWindow : Window
     // mediante su recurso XAML.
     public MainWindow()
         : this(
+            App.Services.GetRequiredService<GetDashboardHandler>(),
             App.Services.GetRequiredService<CreateCalendarEventHandler>(),
             App.Services.GetRequiredService<GetCalendarEventsHandler>(),
             App.Services.GetRequiredService<CreateGoalHandler>(),
@@ -69,6 +72,7 @@ public partial class MainWindow : Window
 
     // Constructor principal con dependencias explícitas.
     public MainWindow(
+        GetDashboardHandler getDashboardHandler,
         CreateCalendarEventHandler createEventHandler,
         GetCalendarEventsHandler getEventsHandler,
         CreateGoalHandler createGoalHandler,
@@ -88,6 +92,7 @@ public partial class MainWindow : Window
         ReopenTaskHandler reopenTaskHandler,
         WorkspaceContext workspaceContext)
     {
+        ArgumentNullException.ThrowIfNull(getDashboardHandler);
         ArgumentNullException.ThrowIfNull(createEventHandler);
         ArgumentNullException.ThrowIfNull(getEventsHandler);
         ArgumentNullException.ThrowIfNull(createGoalHandler);
@@ -107,6 +112,7 @@ public partial class MainWindow : Window
         ArgumentNullException.ThrowIfNull(reopenTaskHandler);
         ArgumentNullException.ThrowIfNull(workspaceContext);
 
+        _getDashboardHandler = getDashboardHandler;
         _createEventHandler = createEventHandler;
         _getEventsHandler = getEventsHandler;
         _createGoalHandler = createGoalHandler;
@@ -143,6 +149,11 @@ public partial class MainWindow : Window
         object? sender,
         RoutedEventArgs e)
     {
+        ShowGoalsView();
+    }
+
+    private void ShowGoalsView()
+    {
         SetActiveNavigation(GoalsButton);
         PageTitle.Text = "Goals";
 
@@ -156,6 +167,11 @@ public partial class MainWindow : Window
         object? sender,
         RoutedEventArgs e)
     {
+        ShowProjectsView();
+    }
+
+    private void ShowProjectsView()
+    {
         SetActiveNavigation(ProjectsButton);
         PageTitle.Text = "Projects";
 
@@ -168,6 +184,11 @@ public partial class MainWindow : Window
     private void ShowTasks(
         object? sender,
         RoutedEventArgs e)
+    {
+        ShowTasksView();
+    }
+
+    private void ShowTasksView()
     {
         SetActiveNavigation(TasksButton);
         PageTitle.Text = "Tasks";
@@ -198,6 +219,11 @@ public partial class MainWindow : Window
         object? sender,
         RoutedEventArgs e)
     {
+        ShowCalendarView();
+    }
+
+    private void ShowCalendarView()
+    {
         SetActiveNavigation(CalendarButton);
         PageTitle.Text = "Calendar";
 
@@ -210,6 +236,11 @@ public partial class MainWindow : Window
     private void ShowNotes(
         object? sender,
         RoutedEventArgs e)
+    {
+        ShowNotesView();
+    }
+
+    private void ShowNotesView()
     {
         SetActiveNavigation(NotesButton);
         PageTitle.Text = "Notes";
@@ -246,7 +277,32 @@ public partial class MainWindow : Window
     {
         SetActiveNavigation(DashboardButton);
         PageTitle.Text = "Dashboard";
-        PageContent.Content = new DashboardView();
+        PageContent.Content = new DashboardView(
+            _getDashboardHandler,
+            NavigateFromDashboard,
+            greeting => GreetingText.Text = greeting);
+    }
+
+    private void NavigateFromDashboard(DashboardDestination destination)
+    {
+        switch (destination)
+        {
+            case DashboardDestination.Goals:
+                ShowGoalsView();
+                break;
+            case DashboardDestination.Projects:
+                ShowProjectsView();
+                break;
+            case DashboardDestination.Tasks:
+                ShowTasksView();
+                break;
+            case DashboardDestination.Calendar:
+                ShowCalendarView();
+                break;
+            case DashboardDestination.Notes:
+                ShowNotesView();
+                break;
+        }
     }
 
     private async void LoadPreferences(object? sender, RoutedEventArgs e)
