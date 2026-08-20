@@ -5,6 +5,9 @@ using Lorcaire.Application.Calendar.CreateCalendarEvent;
 using Lorcaire.Application.Calendar.GetCalendarEvents;
 using Lorcaire.Application.Goals.CreateGoal;
 using Lorcaire.Application.Goals.GetGoals;
+using Lorcaire.Application.Notes.CreateNote;
+using Lorcaire.Application.Notes.GetNotes;
+using Lorcaire.Application.Notes.UpdateNote;
 using Lorcaire.Application.Projects.CreateProject;
 using Lorcaire.Application.Projects.GetProjects;
 using Lorcaire.Application.Resources.CreateResource;
@@ -23,6 +26,9 @@ public partial class MainWindow : Window
     private readonly CreateCalendarEventHandler _createEventHandler;
     private readonly GetCalendarEventsHandler _getEventsHandler;
     private readonly GetGoalsHandler _getGoalsHandler;
+    private readonly CreateNoteHandler _createNoteHandler;
+    private readonly GetNotesHandler _getNotesHandler;
+    private readonly UpdateNoteHandler _updateNoteHandler;
     private readonly CreateProjectHandler _createProjectHandler;
     private readonly GetProjectsHandler _getProjectsHandler;
     private readonly CreateResourceHandler _createResourceHandler;
@@ -41,6 +47,9 @@ public partial class MainWindow : Window
             App.Services.GetRequiredService<GetCalendarEventsHandler>(),
             App.Services.GetRequiredService<CreateGoalHandler>(),
             App.Services.GetRequiredService<GetGoalsHandler>(),
+            App.Services.GetRequiredService<CreateNoteHandler>(),
+            App.Services.GetRequiredService<GetNotesHandler>(),
+            App.Services.GetRequiredService<UpdateNoteHandler>(),
             App.Services.GetRequiredService<CreateProjectHandler>(),
             App.Services.GetRequiredService<GetProjectsHandler>(),
             App.Services.GetRequiredService<CreateResourceHandler>(),
@@ -59,6 +68,9 @@ public partial class MainWindow : Window
         GetCalendarEventsHandler getEventsHandler,
         CreateGoalHandler createGoalHandler,
         GetGoalsHandler getGoalsHandler,
+        CreateNoteHandler createNoteHandler,
+        GetNotesHandler getNotesHandler,
+        UpdateNoteHandler updateNoteHandler,
         CreateProjectHandler createProjectHandler,
         GetProjectsHandler getProjectsHandler,
         CreateResourceHandler createResourceHandler,
@@ -73,6 +85,9 @@ public partial class MainWindow : Window
         ArgumentNullException.ThrowIfNull(getEventsHandler);
         ArgumentNullException.ThrowIfNull(createGoalHandler);
         ArgumentNullException.ThrowIfNull(getGoalsHandler);
+        ArgumentNullException.ThrowIfNull(createNoteHandler);
+        ArgumentNullException.ThrowIfNull(getNotesHandler);
+        ArgumentNullException.ThrowIfNull(updateNoteHandler);
         ArgumentNullException.ThrowIfNull(createProjectHandler);
         ArgumentNullException.ThrowIfNull(getProjectsHandler);
         ArgumentNullException.ThrowIfNull(createResourceHandler);
@@ -87,6 +102,9 @@ public partial class MainWindow : Window
         _getEventsHandler = getEventsHandler;
         _createGoalHandler = createGoalHandler;
         _getGoalsHandler = getGoalsHandler;
+        _createNoteHandler = createNoteHandler;
+        _getNotesHandler = getNotesHandler;
+        _updateNoteHandler = updateNoteHandler;
         _createProjectHandler = createProjectHandler;
         _getProjectsHandler = getProjectsHandler;
         _createResourceHandler = createResourceHandler;
@@ -181,7 +199,13 @@ public partial class MainWindow : Window
         RoutedEventArgs e)
     {
         SetActiveNavigation(NotesButton);
-        ShowPlaceholder("Notes");
+        PageTitle.Text = "Notes";
+
+        PageContent.Content = new NotesView(
+            _createNoteHandler,
+            _getNotesHandler,
+            _updateNoteHandler,
+            _workspaceContext);
     }
 
     private void ShowSettings(

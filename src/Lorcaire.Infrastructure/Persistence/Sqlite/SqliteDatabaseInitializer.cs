@@ -135,6 +135,27 @@ public sealed class SqliteDatabaseInitializer
 
                 CREATE INDEX IF NOT EXISTS ix_calendar_events_start_at
                     ON calendar_events (start_at);
+
+                CREATE TABLE IF NOT EXISTS notes
+                (
+                    id               TEXT NOT NULL PRIMARY KEY,
+                    area_id          TEXT NOT NULL,
+                    title            TEXT NOT NULL,
+                    content          TEXT NOT NULL,
+                    created_at       TEXT NOT NULL,
+                    last_modified_at TEXT NOT NULL,
+
+                    FOREIGN KEY (area_id)
+                        REFERENCES areas (id)
+                        ON UPDATE RESTRICT
+                        ON DELETE RESTRICT
+                );
+
+                CREATE INDEX IF NOT EXISTS ix_notes_area_id
+                    ON notes (area_id);
+
+                CREATE INDEX IF NOT EXISTS ix_notes_last_modified_at
+                    ON notes (last_modified_at DESC);
                 """;
 
             await schemaCommand.ExecuteNonQueryAsync(

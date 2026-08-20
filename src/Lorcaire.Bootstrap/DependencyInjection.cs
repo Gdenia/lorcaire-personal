@@ -5,6 +5,10 @@ using Lorcaire.Application.Calendar.Persistence;
 using Lorcaire.Application.Goals.CreateGoal;
 using Lorcaire.Application.Goals.GetGoals;
 using Lorcaire.Application.Goals.Persistence;
+using Lorcaire.Application.Notes.CreateNote;
+using Lorcaire.Application.Notes.GetNotes;
+using Lorcaire.Application.Notes.Persistence;
+using Lorcaire.Application.Notes.UpdateNote;
 using Lorcaire.Application.Projects.CreateProject;
 using Lorcaire.Application.Projects.GetProjects;
 using Lorcaire.Application.Projects.Persistence;
@@ -49,6 +53,7 @@ public static class DependencyInjection
 
         services.AddSingleton(workspaceContext);
         services.AddSingleton(connectionFactory);
+        services.AddSingleton(TimeProvider.System);
 
         services.AddSingleton<SqliteCalendarEventRepository>();
 
@@ -83,6 +88,22 @@ public static class DependencyInjection
 
         services.AddTransient<CreateGoalHandler>();
         services.AddTransient<GetGoalsHandler>();
+
+        services.AddSingleton<SqliteNoteRepository>();
+
+        services.AddSingleton<INoteRepository>(
+            provider =>
+                provider.GetRequiredService<
+                    SqliteNoteRepository>());
+
+        services.AddSingleton<INoteReader>(
+            provider =>
+                provider.GetRequiredService<
+                    SqliteNoteRepository>());
+
+        services.AddTransient<CreateNoteHandler>();
+        services.AddTransient<GetNotesHandler>();
+        services.AddTransient<UpdateNoteHandler>();
 
         services.AddSingleton<SqliteProjectRepository>();
 

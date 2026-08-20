@@ -1,0 +1,120 @@
+<UserControl
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:notes="clr-namespace:Lorcaire.Application.Notes.GetNotes;assembly=Lorcaire.Application"
+    x:Class="Lorcaire.Desktop.Views.NotesView">
+
+  <Grid RowDefinitions="Auto,*" RowSpacing="14">
+    <TextBlock
+        x:Name="OperationMessage"
+        Grid.Row="0"
+        Foreground="#929AA5"
+        TextWrapping="Wrap"/>
+
+    <Grid
+        Grid.Row="1"
+        ColumnDefinitions="300,*"
+        ColumnSpacing="22">
+      <Border
+          Grid.Column="0"
+          Padding="18"
+          Background="#0F151B"
+          BorderBrush="#252D36"
+          BorderThickness="1"
+          CornerRadius="10">
+        <Grid RowDefinitions="Auto,*" RowSpacing="16">
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock
+                Text="Your notes"
+                Foreground="White"
+                FontSize="20"
+                FontWeight="SemiBold"
+                VerticalAlignment="Center"/>
+            <Button
+                Grid.Column="1"
+                Content="New note"
+                Click="NewNote"
+                Padding="14,8"
+                Background="#20262D"
+                Foreground="#E8B04A"/>
+          </Grid>
+
+          <ScrollViewer Grid.Row="1">
+            <ItemsControl x:Name="NotesList">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="notes:NoteSummary">
+                  <Button
+                      Tag="{Binding}"
+                      Click="SelectNote"
+                      Margin="0,0,0,10"
+                      Padding="14"
+                      HorizontalContentAlignment="Stretch"
+                      Background="#171D24"
+                      BorderThickness="0">
+                    <StackPanel Spacing="6">
+                      <TextBlock
+                          Text="{Binding Title}"
+                          Foreground="White"
+                          FontSize="15"
+                          FontWeight="SemiBold"
+                          TextTrimming="CharacterEllipsis"/>
+                      <TextBlock
+                          Text="{Binding LastModifiedDisplay}"
+                          Foreground="#929AA5"
+                          FontSize="11"/>
+                    </StackPanel>
+                  </Button>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </ScrollViewer>
+        </Grid>
+      </Border>
+
+      <Border
+          Grid.Column="1"
+          Padding="24"
+          Background="#0F151B"
+          BorderBrush="#252D36"
+          BorderThickness="1"
+          CornerRadius="10">
+        <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="14">
+          <TextBlock
+              x:Name="EditorHeading"
+              Text="New note"
+              Foreground="White"
+              FontSize="20"
+              FontWeight="SemiBold"/>
+          <TextBox
+              x:Name="NoteTitle"
+              Grid.Row="1"
+              PlaceholderText="Note title"
+              MaxLength="200"/>
+          <TextBox
+              x:Name="NoteContent"
+              Grid.Row="2"
+              PlaceholderText="Write your note..."
+              AcceptsReturn="True"
+              TextWrapping="Wrap"
+              VerticalContentAlignment="Top"
+              MinHeight="300"
+              MaxLength="20000"/>
+          <Grid Grid.Row="3" ColumnDefinitions="*,Auto">
+            <TextBlock
+                x:Name="LastModifiedText"
+                Foreground="#929AA5"
+                VerticalAlignment="Center"/>
+            <Button
+                x:Name="SaveNoteButton"
+                Grid.Column="1"
+                Content="Create note"
+                Click="SaveNote"
+                Padding="22,10"
+                Background="#E8B04A"
+                Foreground="#080C11"/>
+          </Grid>
+        </Grid>
+      </Border>
+    </Grid>
+  </Grid>
+</UserControl>

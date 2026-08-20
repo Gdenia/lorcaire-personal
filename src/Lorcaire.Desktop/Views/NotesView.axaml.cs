@@ -1,0 +1,137 @@
+using Avalonia.Controls;
+using Avalonia.Interactivity;
+using Lorcaire.Application;
+using Lorcaire.Application.Notes.CreateNote;
+using Lorcaire.Application.Notes.GetNotes;
+using Lorcaire.Application.Notes.UpdateNote;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace Lorcaire.Desktop.Views;
+
+public partial class NotesView : UserControl
+{
+    private readonly CreateNoteHandler _createNoteHandler;
+    private readonly GetNotesHandler _getNotesHandler;
+    private readonly UpdateNoteHandler _updateNoteHandler;
+    private readonly WorkspaceContext _workspaceContext;
+    private Guid? _selectedNoteId;
+
+    public NotesView()
+        : this(
+            App.Services.GetRequiredService<CreateNoteHandler>(),
+            App.Services.GetRequiredService<GetNotesHandler>(),
+            App.Services.GetRequiredService<UpdateNoteHandler>(),
+            App.Services.GetRequiredService<WorkspaceContext>())
+    {
+    }
+
+    public NotesView(
+        CreateNoteHandler createNoteHandler,
+        GetNotesHandler getNotesHandler,
+        UpdateNoteHandler updateNoteHandler,
+        WorkspaceContext workspaceContext)
+    {
+        ArgumentNullException.ThrowIfNull(createNoteHandler);
+        ArgumentNullException.ThrowIfNull(getNotesHandler);
+        ArgumentNullException.ThrowIfNull(updateNoteHandler);
+        ArgumentNullException.ThrowIfNull(workspaceContext);
+
+        _createNoteHandler = createNoteHandler;
+        _getNotesHandler = getNotesHandler;
+        _updateNoteHandler = updateNoteHandler;
+        _workspaceContext = workspaceContext;
+
+        InitializeComponent();
+        Loaded += LoadNotes;
+    }
+
+    private async void LoadNotes(object? sender, RoutedEventArgs e)
+    {
+        try
+        {
+            await RefreshNotesAsync();
+        }
+        catch (Exception exception)
+        {
+            OperationMessage.Text =
+                $"Unable to load notes: {exception.Message}";
+        }
+    }
+
+    private void NewNote(object? sender, RoutedEventArgs e)
+    {
+        ResetEditor();
+        OperationMessage.Text = string.Empty;
+    }
+
+    private void SelectNote(object? sender, RoutedEventArgs e)
+    {
+        if (sender is not Button { Tag: NoteSummary note })
+        {
+            return;
+        }
+
+        _selectedNoteId = note.Id;
+        NoteTitle.Text = note.Title;
+        NoteContent.Text = note.Content;
+        EditorHeading.Text = note.Title;
+        LastModifiedText.Text = note.LastModifiedDisplay;
+        SaveNoteButton.Content = "Save changes";
+        OperationMessage.Text = string.Empty;
+    }
+
+    private async void SaveNote(object? sender, RoutedEventArgs e)
+    {
+        SaveNoteButton.IsEnabled = false;
+        OperationMessage.Text = string.Empty;
+
+        try
+        {
+            if (_selectedNoteId is Guid noteId)
+            {
+                await _updateNoteHandler.HandleAsync(
+                    new UpdateNoteCommand(
+                        noteId,
+                        NoteTitle.Text ?? string.Empty,
+                        NoteContent.Text ?? string.Empty));
+                OperationMessage.Text = "Note updated.";
+            }
+            else
+            {
+                await _createNoteHandler.HandleAsync(
+                    new CreateNoteCommand(
+                        _workspaceContext.DefaultAreaId,
+                        NoteTitle.Text ?? string.Empty,
+                        NoteContent.Text ?? string.Empty));
+                OperationMessage.Text = "Note created.";
+            }
+
+            ResetEditor();
+            await RefreshNotesAsync();
+        }
+        catch (Exception exception)
+        {
+            OperationMessage.Text =
+                $"Unable to save note: {exception.Message}";
+        }
+        finally
+        {
+            SaveNoteButton.IsEnabled = true;
+        }
+    }
+
+    private void ResetEditor()
+    {
+        _selectedNoteId = null;
+        NoteTitle.Text = string.Empty;
+        NoteContent.Text = string.Empty;
+        EditorHeading.Text = "New note";
+        LastModifiedText.Text = string.Empty;
+        SaveNoteButton.Content = "Create note";
+    }
+
+    private async Task RefreshNotesAsync()
+    {
+        NotesList.ItemsSource = await _getNotesHandler.HandleAsync();
+    }
+}
