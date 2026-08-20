@@ -86,6 +86,7 @@ public sealed class UpdateNoteHandlerTests
             UpdateCount++;
             return Task.CompletedTask;
         }
+        public Task<bool> DeleteAsync(NoteId id,CancellationToken c=default)=>Task.FromResult(false);
     }
 
     private sealed class TestTimeProvider(

@@ -13,7 +13,7 @@
         BorderThickness="1"
         CornerRadius="10">
       <StackPanel Spacing="14">
-        <TextBlock
+        <TextBlock x:Name="FormTitle"
             Text="Create a project"
             Foreground="White"
             FontSize="20"
@@ -29,6 +29,7 @@
             TextWrapping="Wrap"
             MinHeight="80"
             MaxLength="1000"/>
+        <StackPanel Orientation="Horizontal" Spacing="10">
         <Button
             x:Name="CreateProjectButton"
             Content="Create project"
@@ -37,6 +38,11 @@
             Padding="22,10"
             Background="#E8B04A"
             Foreground="#080C11"/>
+        <Button x:Name="SaveProjectButton" Content="Save changes" Click="SaveProject" IsVisible="False" Padding="22,10" Background="#E8B04A" Foreground="#080C11"/>
+        <Button x:Name="CancelProjectButton" Content="Cancel" Click="CancelEdit" IsVisible="False" Padding="22,10" Background="#20262D" Foreground="White"/>
+        <Button x:Name="ConfirmDeleteButton" Content="Confirm delete" Click="ConfirmDelete" IsVisible="False" Padding="22,10" Background="#A63D49" Foreground="White"/>
+        <Button x:Name="CancelDeleteButton" Content="Cancel" Click="CancelDelete" IsVisible="False" Padding="22,10" Background="#20262D" Foreground="White"/>
+        </StackPanel>
         <TextBlock
             x:Name="OperationMessage"
             Foreground="#929AA5"
@@ -62,7 +68,7 @@
                 BorderBrush="#252D36"
                 BorderThickness="1"
                 CornerRadius="10">
-              <StackPanel Spacing="7">
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="18"><StackPanel Spacing="7">
                 <TextBlock
                     Text="{Binding Name}"
                     Foreground="White"
@@ -72,7 +78,7 @@
                     Text="{Binding Description}"
                     Foreground="#929AA5"
                     TextWrapping="Wrap"/>
-              </StackPanel>
+              </StackPanel><StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center"><Button Content="Edit" Tag="{Binding Id}" Click="BeginEdit" Padding="14,8" Background="#20262D" Foreground="White"/><Button Content="Delete" Tag="{Binding Id}" Click="DeleteProject" Padding="14,8" Background="#3A2024" Foreground="#F2A0A7"/></StackPanel></Grid>
             </Border>
           </DataTemplate>
         </ItemsControl.ItemTemplate>

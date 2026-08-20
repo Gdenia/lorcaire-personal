@@ -61,4 +61,5 @@ public sealed class InMemoryTaskRepository : ITaskRepository, ITaskReader
             .ToArray();
         return System.Threading.Tasks.Task.FromResult(tasks);
     }
+    public System.Threading.Tasks.Task<bool> DeleteAsync(TaskId id,CancellationToken cancellationToken=default){cancellationToken.ThrowIfCancellationRequested();return System.Threading.Tasks.Task.FromResult(_tasks.TryRemove(id,out _));}
 }

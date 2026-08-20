@@ -2,6 +2,8 @@ using Lorcaire.Application;
 using Lorcaire.Application.Calendar.CreateCalendarEvent;
 using Lorcaire.Application.Calendar.GetCalendarEvents;
 using Lorcaire.Application.Calendar.Persistence;
+using Lorcaire.Application.Calendar.UpdateCalendarEvent;
+using Lorcaire.Application.Calendar.DeleteCalendarEvent;
 using Lorcaire.Application.Dashboard;
 using Lorcaire.Application.Goals.CreateGoal;
 using Lorcaire.Application.Goals.ChangeGoalStatus;
@@ -13,17 +15,24 @@ using Lorcaire.Application.Notes.CreateNote;
 using Lorcaire.Application.Notes.GetNotes;
 using Lorcaire.Application.Notes.Persistence;
 using Lorcaire.Application.Notes.UpdateNote;
+using Lorcaire.Application.Notes.DeleteNote;
 using Lorcaire.Application.Projects.CreateProject;
+using Lorcaire.Application.Projects.DeleteProject;
 using Lorcaire.Application.Projects.GetProjects;
 using Lorcaire.Application.Projects.Persistence;
+using Lorcaire.Application.Projects.UpdateProject;
 using Lorcaire.Application.Resources.CreateResource;
 using Lorcaire.Application.Resources.GetResources;
 using Lorcaire.Application.Resources.Persistence;
+using Lorcaire.Application.Resources.UpdateResource;
+using Lorcaire.Application.Resources.DeleteResource;
 using Lorcaire.Application.Settings;
 using Lorcaire.Application.Tasks.ChangeTaskStatus;
 using Lorcaire.Application.Tasks.CreateTask;
 using Lorcaire.Application.Tasks.GetTasks;
 using Lorcaire.Application.Tasks.Persistence;
+using Lorcaire.Application.Tasks.UpdateTask;
+using Lorcaire.Application.Tasks.DeleteTask;
 using Lorcaire.Core.Domain.Areas;
 using Lorcaire.Infrastructure.Persistence.Sqlite;
 using Lorcaire.Infrastructure.Settings;
@@ -86,6 +95,8 @@ public static class DependencyInjection
 
         services.AddTransient<CreateCalendarEventHandler>();
         services.AddTransient<GetCalendarEventsHandler>();
+        services.AddTransient<UpdateCalendarEventHandler>();
+        services.AddTransient<DeleteCalendarEventHandler>();
         services.AddTransient<GetDashboardHandler>();
 
         services.AddSingleton<
@@ -126,6 +137,7 @@ public static class DependencyInjection
         services.AddTransient<CreateNoteHandler>();
         services.AddTransient<GetNotesHandler>();
         services.AddTransient<UpdateNoteHandler>();
+        services.AddTransient<DeleteNoteHandler>();
 
         services.AddSingleton<SqliteProjectRepository>();
 
@@ -141,6 +153,8 @@ public static class DependencyInjection
 
         services.AddTransient<CreateProjectHandler>();
         services.AddTransient<GetProjectsHandler>();
+        services.AddTransient<UpdateProjectHandler>();
+        services.AddTransient<DeleteProjectHandler>();
 
         services.AddSingleton<SqliteResourceRepository>();
 
@@ -156,6 +170,8 @@ public static class DependencyInjection
 
         services.AddTransient<CreateResourceHandler>();
         services.AddTransient<GetResourcesHandler>();
+        services.AddTransient<UpdateResourceHandler>();
+        services.AddTransient<DeleteResourceHandler>();
 
         services.AddSingleton<SqliteTaskRepository>();
 
@@ -173,6 +189,8 @@ public static class DependencyInjection
         services.AddTransient<GetTasksHandler>();
         services.AddTransient<CompleteTaskHandler>();
         services.AddTransient<ReopenTaskHandler>();
+        services.AddTransient<UpdateTaskHandler>();
+        services.AddTransient<DeleteTaskHandler>();
 
         return services.BuildServiceProvider();
     }

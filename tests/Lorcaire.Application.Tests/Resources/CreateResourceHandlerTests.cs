@@ -90,5 +90,8 @@ public sealed class CreateResourceHandlerTests
             Resources.Add(resource);
             return Task.CompletedTask;
         }
+        public Task<Resource?> GetByIdAsync(ResourceId id,CancellationToken c=default)=>Task.FromResult(Resources.SingleOrDefault(x=>x.Id==id));
+        public Task UpdateAsync(Resource resource,CancellationToken c=default)=>Task.CompletedTask;
+        public Task<bool> DeleteAsync(ResourceId id,CancellationToken c=default)=>Task.FromResult(Resources.RemoveAll(x=>x.Id==id)==1);
     }
 }

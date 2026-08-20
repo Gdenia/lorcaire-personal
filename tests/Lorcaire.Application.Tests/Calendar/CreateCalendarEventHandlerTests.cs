@@ -93,5 +93,8 @@ public sealed class CreateCalendarEventHandlerTests
             Events.Add(calendarEvent);
             return Task.CompletedTask;
         }
+        public Task<CalendarEvent?> GetByIdAsync(CalendarEventId id,CancellationToken c=default)=>Task.FromResult(Events.SingleOrDefault(x=>x.Id==id));
+        public Task UpdateAsync(CalendarEvent item,CancellationToken c=default)=>Task.CompletedTask;
+        public Task<bool> DeleteAsync(CalendarEventId id,CancellationToken c=default)=>Task.FromResult(Events.RemoveAll(x=>x.Id==id)==1);
     }
 }

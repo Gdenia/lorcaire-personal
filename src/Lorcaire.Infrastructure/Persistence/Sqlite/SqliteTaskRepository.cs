@@ -106,6 +106,8 @@ public sealed class SqliteTaskRepository : ITaskRepository, ITaskReader
         }
         return tasks;
     }
+    public async System.Threading.Tasks.Task<bool> DeleteAsync(TaskId id,CancellationToken cancellationToken=default)
+    { await using var connection=_connectionFactory.CreateConnection();await connection.OpenAsync(cancellationToken);await using var command=connection.CreateCommand();command.CommandText="DELETE FROM tasks WHERE id=$id;";command.Parameters.AddWithValue("$id",id.Value.ToString());try{return await command.ExecuteNonQueryAsync(cancellationToken)==1;}catch(SqliteException ex) when(ex.SqliteErrorCode==19){throw new InvalidOperationException("The task cannot be deleted because other information depends on it.",ex);} }
 
     private static DomainTask ReadTask(SqliteDataReader reader) =>
         new(

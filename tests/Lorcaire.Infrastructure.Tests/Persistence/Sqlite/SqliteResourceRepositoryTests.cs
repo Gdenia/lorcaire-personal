@@ -6,6 +6,7 @@ namespace Lorcaire.Infrastructure.Tests.Persistence.Sqlite;
 
 public sealed class SqliteResourceRepositoryTests
 {
+    [Fact] public async Task Repository_UpdatesAndDeletes(){await using var database=await TemporaryDatabase.CreateAsync();var r=new SqliteResourceRepository(database.ConnectionFactory);var x=new Resource(ResourceId.New(),database.DefaultAreaId,"Old","Book");await r.AddAsync(x);x.Rename("New");x.ChangeCategory("Course");await r.UpdateAsync(x);Assert.Equal("Course",(await r.GetByIdAsync(x.Id))!.Category);Assert.True(await r.DeleteAsync(x.Id));Assert.False(await r.DeleteAsync(x.Id));}
     [Fact]
     public async Task Repository_PersistsAndReadsResource()
     {

@@ -15,4 +15,5 @@ public interface INoteRepository
     Task UpdateAsync(
         Note note,
         CancellationToken cancellationToken = default);
+    Task<bool> DeleteAsync(NoteId noteId,CancellationToken cancellationToken=default);
 }

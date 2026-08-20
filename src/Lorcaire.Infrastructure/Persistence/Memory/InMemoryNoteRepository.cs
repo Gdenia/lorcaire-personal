@@ -60,4 +60,5 @@ public sealed class InMemoryNoteRepository : INoteRepository, INoteReader
             .ToArray();
         return Task.FromResult(notes);
     }
+    public Task<bool> DeleteAsync(NoteId id,CancellationToken c=default){c.ThrowIfCancellationRequested();return Task.FromResult(_notes.TryRemove(id,out _));}
 }

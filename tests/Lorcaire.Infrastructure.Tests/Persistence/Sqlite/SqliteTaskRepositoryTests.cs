@@ -91,6 +91,22 @@ public sealed class SqliteTaskRepositoryTests
             () => repository.UpdateAsync(task));
     }
 
+    [Fact]
+    public async System.Threading.Tasks.Task Repository_UpdatesWithoutChangingStatus_AndDeletes()
+    {
+        await using var database = await TemporaryDatabase.CreateAsync();
+        var repository = new SqliteTaskRepository(database.ConnectionFactory);
+        var task = new DomainTask(TaskId.New(), database.DefaultAreaId, "Old", isCompleted: true);
+        await repository.AddAsync(task);
+        task.Rename("New");
+        await repository.UpdateAsync(task);
+        var stored = await repository.GetByIdAsync(task.Id);
+        Assert.Equal("New", stored!.Title);
+        Assert.True(stored.IsCompleted);
+        Assert.True(await repository.DeleteAsync(task.Id));
+        Assert.False(await repository.DeleteAsync(task.Id));
+    }
+
     private sealed class TemporaryDatabase : IAsyncDisposable
     {
         private readonly string _directoryPath;

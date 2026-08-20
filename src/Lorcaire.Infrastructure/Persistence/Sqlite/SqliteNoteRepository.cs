@@ -109,6 +109,7 @@ public sealed class SqliteNoteRepository : INoteRepository, INoteReader
         }
         return notes;
     }
+    public async Task<bool> DeleteAsync(NoteId id,CancellationToken c=default){await using var connection=_connectionFactory.CreateConnection();await connection.OpenAsync(c);await using var command=connection.CreateCommand();command.CommandText="DELETE FROM notes WHERE id=$id;";command.Parameters.AddWithValue("$id",id.Value.ToString());try{return await command.ExecuteNonQueryAsync(c)==1;}catch(SqliteException ex)when(ex.SqliteErrorCode==19){throw new InvalidOperationException("The note cannot be deleted because other information depends on it.",ex);}}
 
     private static Note ReadNote(SqliteDataReader reader) =>
         new(

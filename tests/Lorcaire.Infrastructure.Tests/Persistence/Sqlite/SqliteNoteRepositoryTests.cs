@@ -6,6 +6,7 @@ namespace Lorcaire.Infrastructure.Tests.Persistence.Sqlite;
 
 public sealed class SqliteNoteRepositoryTests
 {
+    [Fact] public async Task Repository_DeletesWithoutAffectingOtherNotes(){await using var database=await TemporaryDatabase.CreateAsync();var r=new SqliteNoteRepository(database.ConnectionFactory);var now=DateTimeOffset.UtcNow;var first=new Note(NoteId.New(),database.DefaultAreaId,"First","Body",now);var second=new Note(NoteId.New(),database.DefaultAreaId,"Second","Body",now);await r.AddAsync(first);await r.AddAsync(second);Assert.True(await r.DeleteAsync(first.Id));Assert.False(await r.DeleteAsync(first.Id));Assert.Equal(second.Id,(await r.GetByIdAsync(second.Id))!.Id);}
     [Fact]
     public async Task Repository_PersistsAndReadsNote()
     {

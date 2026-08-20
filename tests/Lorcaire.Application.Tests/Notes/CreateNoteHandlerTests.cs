@@ -88,6 +88,7 @@ public sealed class CreateNoteHandlerTests
             Note note,
             CancellationToken cancellationToken = default) =>
             Task.CompletedTask;
+        public Task<bool> DeleteAsync(NoteId id,CancellationToken c=default)=>Task.FromResult(false);
     }
 
     private sealed class TestTimeProvider(

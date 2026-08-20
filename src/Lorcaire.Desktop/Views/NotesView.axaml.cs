@@ -4,6 +4,7 @@ using Lorcaire.Application;
 using Lorcaire.Application.Notes.CreateNote;
 using Lorcaire.Application.Notes.GetNotes;
 using Lorcaire.Application.Notes.UpdateNote;
+using Lorcaire.Application.Notes.DeleteNote;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Lorcaire.Desktop.Views;
@@ -13,8 +14,10 @@ public partial class NotesView : UserControl
     private readonly CreateNoteHandler _createNoteHandler;
     private readonly GetNotesHandler _getNotesHandler;
     private readonly UpdateNoteHandler _updateNoteHandler;
+    private readonly DeleteNoteHandler _deleteNoteHandler;
     private readonly WorkspaceContext _workspaceContext;
     private Guid? _selectedNoteId;
+    private bool _deletePending;
 
     public NotesView()
         : this(
@@ -39,6 +42,7 @@ public partial class NotesView : UserControl
         _createNoteHandler = createNoteHandler;
         _getNotesHandler = getNotesHandler;
         _updateNoteHandler = updateNoteHandler;
+        _deleteNoteHandler=App.Services.GetRequiredService<DeleteNoteHandler>();
         _workspaceContext = workspaceContext;
 
         InitializeComponent();
@@ -77,8 +81,12 @@ public partial class NotesView : UserControl
         EditorHeading.Text = note.Title;
         LastModifiedText.Text = note.LastModifiedDisplay;
         SaveNoteButton.Content = "Save changes";
+        DeleteNoteButton.IsVisible = true;
+        _deletePending=false;CancelDeleteButton.IsVisible=false;DeleteNoteButton.Content="Delete";
         OperationMessage.Text = string.Empty;
     }
+    private async void DeleteNote(object? sender,RoutedEventArgs e){if(_selectedNoteId is not Guid id)return;if(!_deletePending){_deletePending=true;DeleteNoteButton.Content="Confirm delete";CancelDeleteButton.IsVisible=true;OperationMessage.Text="Confirm deletion or cancel.";return;}try{await _deleteNoteHandler.HandleAsync(id);ResetEditor();await RefreshNotesAsync();OperationMessage.Text="Note deleted.";}catch(Exception ex){OperationMessage.Text=$"Unable to delete note: {ex.Message}";}}
+    private void CancelDelete(object? sender,RoutedEventArgs e){_deletePending=false;DeleteNoteButton.Content="Delete";CancelDeleteButton.IsVisible=false;OperationMessage.Text="Deletion cancelled.";}
 
     private async void SaveNote(object? sender, RoutedEventArgs e)
     {
@@ -128,6 +136,9 @@ public partial class NotesView : UserControl
         EditorHeading.Text = "New note";
         LastModifiedText.Text = string.Empty;
         SaveNoteButton.Content = "Create note";
+        DeleteNoteButton.IsVisible = false;
+        CancelDeleteButton.IsVisible = false;
+        _deletePending = false;
     }
 
     private async Task RefreshNotesAsync()

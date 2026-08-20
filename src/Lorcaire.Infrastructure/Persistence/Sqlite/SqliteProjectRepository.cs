@@ -76,4 +76,31 @@ public sealed class SqliteProjectRepository :
 
         return projects;
     }
+
+    public async Task<Project?> GetByIdAsync(ProjectId id, CancellationToken cancellationToken = default)
+    {
+        await using var connection = _connectionFactory.CreateConnection(); await connection.OpenAsync(cancellationToken);
+        await using var command = connection.CreateCommand(); command.CommandText = "SELECT id, area_id, name, description FROM projects WHERE id = $id;"; command.Parameters.AddWithValue("$id", id.Value.ToString());
+        await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+        return await reader.ReadAsync(cancellationToken) ? ReadProject(reader) : null;
+    }
+
+    public async Task UpdateAsync(Project project, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(project); await using var connection = _connectionFactory.CreateConnection(); await connection.OpenAsync(cancellationToken);
+        await using var command = connection.CreateCommand(); command.CommandText = "UPDATE projects SET area_id=$areaId, name=$name, description=$description WHERE id=$id;"; AddParameters(command, project);
+        if (await command.ExecuteNonQueryAsync(cancellationToken) == 0) throw new InvalidOperationException($"No existe un proyecto con identificador '{project.Id}'.");
+    }
+
+    public async Task<bool> DeleteAsync(ProjectId id, CancellationToken cancellationToken = default)
+    {
+        await using var connection = _connectionFactory.CreateConnection(); await connection.OpenAsync(cancellationToken);
+        await using var command = connection.CreateCommand(); command.CommandText = "DELETE FROM projects WHERE id=$id;"; command.Parameters.AddWithValue("$id", id.Value.ToString());
+        try { return await command.ExecuteNonQueryAsync(cancellationToken) == 1; }
+        catch (SqliteException ex) when (ex.SqliteErrorCode == 19) { throw new InvalidOperationException("The project cannot be deleted because other information depends on it.", ex); }
+    }
+
+    private static Project ReadProject(SqliteDataReader reader) => new(new ProjectId(Guid.Parse(reader.GetString(0))), new AreaId(Guid.Parse(reader.GetString(1))), reader.GetString(2), reader.IsDBNull(3) ? null : reader.GetString(3));
+    private static void AddParameters(SqliteCommand command, Project project)
+    { command.Parameters.AddWithValue("$id", project.Id.Value.ToString()); command.Parameters.AddWithValue("$areaId", project.AreaId.Value.ToString()); command.Parameters.AddWithValue("$name", project.Name); command.Parameters.AddWithValue("$description", project.Description is null ? DBNull.Value : project.Description); }
 }

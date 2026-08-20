@@ -1,0 +1,3 @@
+using Lorcaire.Application.Calendar.Persistence;using Lorcaire.Core.Domain.Calendar;
+namespace Lorcaire.Application.Calendar.UpdateCalendarEvent;
+public sealed class UpdateCalendarEventHandler(ICalendarEventRepository repository){public async Task HandleAsync(UpdateCalendarEventCommand command,CancellationToken c=default){ArgumentNullException.ThrowIfNull(command);var item=await repository.GetByIdAsync(new CalendarEventId(command.EventId),c)??throw new CalendarEventNotFoundException(command.EventId);item.Rename(command.Title);item.ChangeDescription(command.Description);item.Reschedule(command.StartAt,command.EndAt);await repository.UpdateAsync(item,c);}}

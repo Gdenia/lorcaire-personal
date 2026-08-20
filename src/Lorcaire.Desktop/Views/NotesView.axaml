@@ -99,7 +99,7 @@
               VerticalContentAlignment="Top"
               MinHeight="300"
               MaxLength="20000"/>
-          <Grid Grid.Row="3" ColumnDefinitions="*,Auto">
+          <Grid Grid.Row="3" ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="10">
             <TextBlock
                 x:Name="LastModifiedText"
                 Foreground="#929AA5"
@@ -112,6 +112,8 @@
                 Padding="22,10"
                 Background="#E8B04A"
                 Foreground="#080C11"/>
+            <Button x:Name="DeleteNoteButton" Grid.Column="2" Content="Delete" Click="DeleteNote" IsVisible="False" Padding="18,10" Background="#3A2024" Foreground="#F2A0A7"/>
+            <Button x:Name="CancelDeleteButton" Grid.Column="3" Content="Cancel delete" Click="CancelDelete" IsVisible="False" Padding="18,10" Background="#20262D" Foreground="White"/>
           </Grid>
         </Grid>
       </Border>

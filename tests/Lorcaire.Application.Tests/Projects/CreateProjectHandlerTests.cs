@@ -75,5 +75,8 @@ public sealed class CreateProjectHandlerTests
             Projects.Add(project);
             return Task.CompletedTask;
         }
+        public Task<Project?> GetByIdAsync(ProjectId id, CancellationToken cancellationToken = default) => Task.FromResult(Projects.SingleOrDefault(x => x.Id == id));
+        public Task UpdateAsync(Project project, CancellationToken cancellationToken = default) => Task.CompletedTask;
+        public Task<bool> DeleteAsync(ProjectId id, CancellationToken cancellationToken = default) => Task.FromResult(Projects.RemoveAll(x => x.Id == id) == 1);
     }
 }
