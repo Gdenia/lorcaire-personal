@@ -5,6 +5,9 @@ namespace Lorcaire.Core.Tests.Domain.Calendar;
 
 public sealed class CalendarEventTests
 {
+    private static readonly DateTimeOffset Start =
+        new(2026, 8, 21, 10, 0, 0, TimeSpan.Zero);
+
     [Fact]
     public void Constructor_CreatesEvent_WithNormalizedData()
     {
@@ -24,8 +27,10 @@ public sealed class CalendarEventTests
         Assert.Equal(areaId, calendarEvent.AreaId);
         Assert.Equal("Project review", calendarEvent.Title);
         Assert.Equal("Review progress.", calendarEvent.Description);
-        Assert.Equal(start, calendarEvent.StartAt);
-        Assert.Equal(end, calendarEvent.EndAt);
+        Assert.Equal(start.ToUniversalTime(), calendarEvent.StartAt);
+        Assert.Equal(end.ToUniversalTime(), calendarEvent.EndAt);
+        Assert.Equal(TimeSpan.Zero, calendarEvent.StartAt.Offset);
+        Assert.Equal(TimeSpan.Zero, calendarEvent.EndAt!.Value.Offset);
     }
 
     [Theory]
@@ -38,7 +43,7 @@ public sealed class CalendarEventTests
                 CalendarEventId.New(),
                 AreaId.New(),
                 title,
-                DateTimeOffset.Now));
+                Start));
     }
 
     [Fact]
@@ -48,7 +53,7 @@ public sealed class CalendarEventTests
             CalendarEventId.New(),
             AreaId.New(),
             "Open event",
-            DateTimeOffset.Now);
+            Start);
 
         Assert.Null(calendarEvent.EndAt);
     }
@@ -56,7 +61,7 @@ public sealed class CalendarEventTests
     [Fact]
     public void Constructor_RejectsEndBeforeStart()
     {
-        var start = DateTimeOffset.Now;
+        var start = Start;
 
         Assert.Throws<ArgumentException>(() =>
             new CalendarEvent(
@@ -70,7 +75,7 @@ public sealed class CalendarEventTests
     [Fact]
     public void Reschedule_RejectsInvalidRange_AndPreservesSchedule()
     {
-        var start = DateTimeOffset.Now;
+        var start = Start;
         var calendarEvent = new CalendarEvent(
             CalendarEventId.New(),
             AreaId.New(),
@@ -105,6 +110,6 @@ public sealed class CalendarEventTests
             CalendarEventId.New(),
             AreaId.New(),
             "Event",
-            DateTimeOffset.Now,
+            Start,
             description: "Description");
 }

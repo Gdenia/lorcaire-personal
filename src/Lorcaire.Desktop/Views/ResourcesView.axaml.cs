@@ -5,7 +5,6 @@ using Lorcaire.Application.Resources.CreateResource;
 using Lorcaire.Application.Resources.GetResources;
 using Lorcaire.Application.Resources.UpdateResource;
 using Lorcaire.Application.Resources.DeleteResource;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Lorcaire.Desktop.Views;
 
@@ -18,26 +17,23 @@ public partial class ResourcesView : UserControl
     private readonly WorkspaceContext _workspaceContext;
     private IReadOnlyList<ResourceSummary> _resources=[]; private Guid? _editingId; private Guid? _pendingDeleteId;
 
-    public ResourcesView()
-        : this(
-            App.Services.GetRequiredService<CreateResourceHandler>(),
-            App.Services.GetRequiredService<GetResourcesHandler>(),
-            App.Services.GetRequiredService<WorkspaceContext>())
-    {
-    }
-
     public ResourcesView(
         CreateResourceHandler createResourceHandler,
         GetResourcesHandler getResourcesHandler,
+        UpdateResourceHandler updateResourceHandler,
+        DeleteResourceHandler deleteResourceHandler,
         WorkspaceContext workspaceContext)
     {
         ArgumentNullException.ThrowIfNull(createResourceHandler);
         ArgumentNullException.ThrowIfNull(getResourcesHandler);
+        ArgumentNullException.ThrowIfNull(updateResourceHandler);
+        ArgumentNullException.ThrowIfNull(deleteResourceHandler);
         ArgumentNullException.ThrowIfNull(workspaceContext);
 
         _createResourceHandler = createResourceHandler;
         _getResourcesHandler = getResourcesHandler;
-        _updateResourceHandler=App.Services.GetRequiredService<UpdateResourceHandler>();_deleteResourceHandler=App.Services.GetRequiredService<DeleteResourceHandler>();
+        _updateResourceHandler = updateResourceHandler;
+        _deleteResourceHandler = deleteResourceHandler;
         _workspaceContext = workspaceContext;
 
         InitializeComponent();

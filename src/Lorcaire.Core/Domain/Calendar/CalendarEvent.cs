@@ -23,8 +23,8 @@ public sealed class CalendarEvent
         AreaId = areaId;
         Title = ValidateTitle(title);
         ValidateSchedule(startAt, endAt);
-        StartAt = startAt;
-        EndAt = endAt;
+        StartAt = startAt.ToUniversalTime();
+        EndAt = endAt?.ToUniversalTime();
         Description = NormalizeDescription(description);
     }
 
@@ -36,8 +36,8 @@ public sealed class CalendarEvent
     public void Reschedule(DateTimeOffset startAt, DateTimeOffset? endAt = null)
     {
         ValidateSchedule(startAt, endAt);
-        StartAt = startAt;
-        EndAt = endAt;
+        StartAt = startAt.ToUniversalTime();
+        EndAt = endAt?.ToUniversalTime();
     }
 
     private static string ValidateTitle(string title)

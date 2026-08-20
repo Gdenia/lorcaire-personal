@@ -45,14 +45,16 @@ public static class DependencyInjection
     private static readonly Guid DefaultAreaId =
         Guid.Parse("a8324f29-1517-4bd8-a15d-cf4fdc61ad35");
 
-    public static IServiceProvider CreateServiceProvider()
+    public static IServiceProvider CreateServiceProvider(
+        Action<IServiceCollection>? configureServices = null,
+        string? personalDataPath = null)
     {
         var services = new ServiceCollection();
 
         var workspaceContext =
             new WorkspaceContext(DefaultAreaId);
 
-        var personalDataPath = GetPersonalDataPath();
+        personalDataPath ??= GetPersonalDataPath();
         var databasePath = Path.Combine(
             personalDataPath,
             "lorcaire.db");
@@ -192,7 +194,14 @@ public static class DependencyInjection
         services.AddTransient<UpdateTaskHandler>();
         services.AddTransient<DeleteTaskHandler>();
 
-        return services.BuildServiceProvider();
+        configureServices?.Invoke(services);
+
+        return services.BuildServiceProvider(
+            new ServiceProviderOptions
+            {
+                ValidateOnBuild = true,
+                ValidateScopes = true
+            });
     }
 
     private static string GetPersonalDataPath()

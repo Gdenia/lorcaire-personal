@@ -1,7 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Lorcaire.Application.Settings;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Lorcaire.Desktop.Views;
 
@@ -10,13 +9,6 @@ public partial class SettingsView : UserControl
     private readonly GetUserPreferencesHandler _getPreferencesHandler;
     private readonly SaveUserPreferencesHandler _savePreferencesHandler;
     private readonly Action<UserPreferences>? _preferencesSaved;
-
-    public SettingsView()
-        : this(
-            App.Services.GetRequiredService<GetUserPreferencesHandler>(),
-            App.Services.GetRequiredService<SaveUserPreferencesHandler>())
-    {
-    }
 
     public SettingsView(
         GetUserPreferencesHandler getPreferencesHandler,

@@ -9,6 +9,7 @@
   <Folder Name="/tests/">
     <Project Path="tests/Lorcaire.Application.Tests/Lorcaire.Application.Tests.csproj" />
     <Project Path="tests/Lorcaire.Core.Tests/Lorcaire.Core.Tests.csproj" />
+    <Project Path="tests/Lorcaire.Desktop.Tests/Lorcaire.Desktop.Tests.csproj" />
     <Project Path="tests/Lorcaire.Infrastructure.Tests/Lorcaire.Infrastructure.Tests.csproj" />
   </Folder>
 </Solution>

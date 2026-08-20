@@ -2,6 +2,7 @@
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:dashboard="clr-namespace:Lorcaire.Application.Dashboard;assembly=Lorcaire.Application"
+    xmlns:views="clr-namespace:Lorcaire.Desktop.Views"
     x:Class="Lorcaire.Desktop.Views.DashboardView">
 
   <StackPanel Spacing="20">
@@ -72,7 +73,7 @@
           <TextBlock x:Name="EventsEmptyState" Text="No upcoming events." Foreground="#929AA5"/>
           <ItemsControl x:Name="UpcomingEventsList">
             <ItemsControl.ItemTemplate>
-              <DataTemplate x:DataType="dashboard:DashboardEventItem">
+              <DataTemplate x:DataType="views:DashboardEventDisplayItem">
                 <Border Padding="0,10" BorderBrush="#252D36" BorderThickness="0,0,0,1">
                   <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
                     <TextBlock Text="{Binding Title}" Foreground="White" FontWeight="SemiBold"/>
@@ -93,7 +94,7 @@
           <TextBlock x:Name="ActivityEmptyState" Text="No recent activity is available yet." Foreground="#929AA5"/>
           <ItemsControl x:Name="RecentActivityList">
             <ItemsControl.ItemTemplate>
-              <DataTemplate x:DataType="dashboard:DashboardActivityItem">
+              <DataTemplate x:DataType="views:DashboardActivityDisplayItem">
                 <Grid Margin="0,5" ColumnDefinitions="*,Auto" ColumnSpacing="12">
                   <TextBlock Text="{Binding Description}" Foreground="White"/>
                   <TextBlock Grid.Column="1" Text="{Binding OccurredAtDisplay}" Foreground="#929AA5"/>

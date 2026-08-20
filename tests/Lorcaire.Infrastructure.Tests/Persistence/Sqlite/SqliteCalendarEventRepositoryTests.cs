@@ -1,11 +1,15 @@
 using Lorcaire.Core.Domain.Areas;
 using Lorcaire.Core.Domain.Calendar;
 using Lorcaire.Infrastructure.Persistence.Sqlite;
+using Microsoft.Data.Sqlite;
 
 namespace Lorcaire.Infrastructure.Tests.Persistence.Sqlite;
 
 public sealed class SqliteCalendarEventRepositoryTests
 {
+    private static readonly DateTimeOffset Now =
+        new(2026, 8, 20, 10, 0, 0, TimeSpan.Zero);
+
     [Fact]
     public async Task Repository_PersistsAndReadsEvent()
     {
@@ -39,6 +43,19 @@ public sealed class SqliteCalendarEventRepositoryTests
         Assert.Equal(calendarEvent.Description, stored.Description);
         Assert.Equal(calendarEvent.StartAt, stored.StartAt);
         Assert.Equal(calendarEvent.EndAt, stored.EndAt);
+        Assert.Equal(TimeSpan.Zero, stored.StartAt.Offset);
+        Assert.Equal(TimeSpan.Zero, stored.EndAt!.Value.Offset);
+
+        await using var connection = database.ConnectionFactory.CreateConnection();
+        await connection.OpenAsync();
+        await using var command = connection.CreateCommand();
+        command.CommandText =
+            "SELECT start_at, end_at FROM calendar_events WHERE id = $id;";
+        command.Parameters.AddWithValue("$id", calendarEvent.Id.Value.ToString());
+        await using var raw = await command.ExecuteReaderAsync();
+        Assert.True(await raw.ReadAsync());
+        Assert.EndsWith("+00:00", raw.GetString(0), StringComparison.Ordinal);
+        Assert.EndsWith("+00:00", raw.GetString(1), StringComparison.Ordinal);
     }
 
     [Fact]
@@ -51,12 +68,12 @@ public sealed class SqliteCalendarEventRepositoryTests
             CalendarEventId.New(),
             database.DefaultAreaId,
             "First",
-            DateTimeOffset.Now.AddDays(1));
+            new DateTimeOffset(2026, 8, 21, 9, 30, 0, TimeSpan.FromHours(-4)));
         var second = new CalendarEvent(
             CalendarEventId.New(),
             database.DefaultAreaId,
             "Second",
-            DateTimeOffset.Now.AddDays(2));
+            new DateTimeOffset(2026, 8, 21, 15, 0, 0, TimeSpan.FromHours(2)));
         await repository.AddAsync(second);
         await repository.AddAsync(first);
 
@@ -64,8 +81,8 @@ public sealed class SqliteCalendarEventRepositoryTests
 
         Assert.Collection(
             events,
-            calendarEvent => Assert.Equal(first.Id, calendarEvent.Id),
-            calendarEvent => Assert.Equal(second.Id, calendarEvent.Id));
+            calendarEvent => Assert.Equal(second.Id, calendarEvent.Id),
+            calendarEvent => Assert.Equal(first.Id, calendarEvent.Id));
     }
 
     [Fact]
@@ -78,7 +95,7 @@ public sealed class SqliteCalendarEventRepositoryTests
             CalendarEventId.New(),
             AreaId.New(),
             "Event",
-            DateTimeOffset.Now);
+            Now);
 
         await Assert.ThrowsAsync<InvalidOperationException>(
             () => repository.AddAsync(calendarEvent));
@@ -94,14 +111,14 @@ public sealed class SqliteCalendarEventRepositoryTests
             CalendarEventId.New(),
             database.DefaultAreaId,
             "Event",
-            DateTimeOffset.Now);
+            Now);
         await repository.AddAsync(calendarEvent);
 
         await Assert.ThrowsAsync<InvalidOperationException>(
             () => repository.AddAsync(calendarEvent));
     }
 
-    [Fact] public async Task Repository_UpdatesAndDeletes(){await using var database=await TemporaryDatabase.CreateAsync();var r=new SqliteCalendarEventRepository(database.ConnectionFactory);var start=DateTimeOffset.UtcNow.AddDays(1);var x=new CalendarEvent(CalendarEventId.New(),database.DefaultAreaId,"Old",start);await r.AddAsync(x);x.Rename("New");x.Reschedule(start.AddHours(1),start.AddHours(2));await r.UpdateAsync(x);Assert.Equal("New",(await r.GetByIdAsync(x.Id))!.Title);Assert.True(await r.DeleteAsync(x.Id));Assert.False(await r.DeleteAsync(x.Id));}
+    [Fact] public async Task Repository_UpdatesAndDeletes(){await using var database=await TemporaryDatabase.CreateAsync();var r=new SqliteCalendarEventRepository(database.ConnectionFactory);var start=Now.AddDays(1);var x=new CalendarEvent(CalendarEventId.New(),database.DefaultAreaId,"Old",start);await r.AddAsync(x);x.Rename("New");x.Reschedule(start.AddHours(1),start.AddHours(2));await r.UpdateAsync(x);Assert.Equal("New",(await r.GetByIdAsync(x.Id))!.Title);Assert.True(await r.DeleteAsync(x.Id));Assert.False(await r.DeleteAsync(x.Id));}
 
     private sealed class TemporaryDatabase : IAsyncDisposable
     {

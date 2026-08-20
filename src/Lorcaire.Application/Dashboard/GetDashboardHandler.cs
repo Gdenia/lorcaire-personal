@@ -82,7 +82,8 @@ public sealed class GetDashboardHandler
             .ToArray();
 
         var upcomingEvents = events
-            .Where(calendarEvent => calendarEvent.StartAt >= now)
+            .Where(calendarEvent =>
+                (calendarEvent.EndAt ?? calendarEvent.StartAt) >= now)
             .OrderBy(calendarEvent => calendarEvent.StartAt)
             .ThenBy(calendarEvent => calendarEvent.Title)
             .Take(MaximumUpcomingEvents)

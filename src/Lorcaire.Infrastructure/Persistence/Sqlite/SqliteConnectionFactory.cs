@@ -9,6 +9,8 @@ public sealed class SqliteConnectionFactory
 
     private readonly string _connectionString;
 
+    internal string DatabasePath { get; }
+
     public SqliteConnectionFactory(string databasePath)
     {
         if (string.IsNullOrWhiteSpace(databasePath))
@@ -21,6 +23,7 @@ public sealed class SqliteConnectionFactory
         EnsureProviderInitialized();
 
         var fullPath = Path.GetFullPath(databasePath);
+        DatabasePath = fullPath;
         var directory = Path.GetDirectoryName(fullPath);
 
         if (!string.IsNullOrWhiteSpace(directory))

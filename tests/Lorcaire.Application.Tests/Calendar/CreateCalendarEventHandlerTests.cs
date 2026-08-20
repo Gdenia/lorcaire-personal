@@ -13,7 +13,14 @@ public sealed class CreateCalendarEventHandlerTests
     {
         var repository = new FakeCalendarEventRepository();
         var areaId = Guid.NewGuid();
-        var start = DateTimeOffset.Now.AddDays(1);
+        var start = new DateTimeOffset(
+            2026,
+            8,
+            21,
+            12,
+            0,
+            0,
+            TimeSpan.FromHours(2));
         var end = start.AddHours(2);
         var handler = new CreateCalendarEventHandler(
             new FakeAreaRepository(true),
@@ -30,8 +37,8 @@ public sealed class CreateCalendarEventHandlerTests
         var calendarEvent = Assert.Single(repository.Events);
         Assert.Equal(result.CalendarEventId, calendarEvent.Id.Value);
         Assert.Equal(areaId, calendarEvent.AreaId.Value);
-        Assert.Equal(start, calendarEvent.StartAt);
-        Assert.Equal(end, calendarEvent.EndAt);
+        Assert.Equal(start.ToUniversalTime(), calendarEvent.StartAt);
+        Assert.Equal(end.ToUniversalTime(), calendarEvent.EndAt);
     }
 
     [Fact]
@@ -48,7 +55,7 @@ public sealed class CreateCalendarEventHandlerTests
                     Guid.NewGuid(),
                     "Review",
                     null,
-                    DateTimeOffset.Now,
+                    new DateTimeOffset(2026, 8, 20, 10, 0, 0, TimeSpan.Zero),
                     null)));
         Assert.Empty(repository.Events);
     }
@@ -60,7 +67,8 @@ public sealed class CreateCalendarEventHandlerTests
         var handler = new CreateCalendarEventHandler(
             new FakeAreaRepository(true),
             repository);
-        var start = DateTimeOffset.Now;
+        var start =
+            new DateTimeOffset(2026, 8, 20, 10, 0, 0, TimeSpan.Zero);
 
         await Assert.ThrowsAsync<ArgumentException>(() =>
             handler.HandleAsync(

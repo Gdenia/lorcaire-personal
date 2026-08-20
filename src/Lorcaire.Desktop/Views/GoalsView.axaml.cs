@@ -7,7 +7,6 @@ using Lorcaire.Application.Goals.CreateGoal;
 using Lorcaire.Application.Goals.DeleteGoal;
 using Lorcaire.Application.Goals.GetGoals;
 using Lorcaire.Application.Goals.UpdateGoal;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Lorcaire.Desktop.Views;
 
@@ -23,18 +22,6 @@ public partial class GoalsView : UserControl
     private IReadOnlyList<GoalSummary> _goals = [];
     private Guid? _editingGoalId;
     private Guid? _pendingDeleteGoalId;
-
-    public GoalsView()
-        : this(
-            App.Services.GetRequiredService<CreateGoalHandler>(),
-            App.Services.GetRequiredService<GetGoalsHandler>(),
-            App.Services.GetRequiredService<UpdateGoalHandler>(),
-            App.Services.GetRequiredService<DeleteGoalHandler>(),
-            App.Services.GetRequiredService<CompleteGoalHandler>(),
-            App.Services.GetRequiredService<ReopenGoalHandler>(),
-            App.Services.GetRequiredService<WorkspaceContext>())
-    {
-    }
 
     public GoalsView(
         CreateGoalHandler createGoalHandler,

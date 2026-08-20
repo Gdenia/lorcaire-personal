@@ -7,7 +7,6 @@ using Lorcaire.Application.Tasks.GetTasks;
 using Lorcaire.Application.Tasks.UpdateTask;
 using Lorcaire.Application.Tasks.DeleteTask;
 using Lorcaire.Application.Settings;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Lorcaire.Desktop.Views;
 
@@ -25,23 +24,14 @@ public partial class TasksView : UserControl
     private Guid? _editingId;
     private Guid? _pendingDeleteId;
 
-    public TasksView()
-        : this(
-            App.Services.GetRequiredService<CreateTaskHandler>(),
-            App.Services.GetRequiredService<GetTasksHandler>(),
-            App.Services.GetRequiredService<CompleteTaskHandler>(),
-            App.Services.GetRequiredService<ReopenTaskHandler>(),
-            App.Services.GetRequiredService<GetUserPreferencesHandler>(),
-            App.Services.GetRequiredService<WorkspaceContext>())
-    {
-    }
-
     public TasksView(
         CreateTaskHandler createTaskHandler,
         GetTasksHandler getTasksHandler,
         CompleteTaskHandler completeTaskHandler,
         ReopenTaskHandler reopenTaskHandler,
         GetUserPreferencesHandler getPreferencesHandler,
+        UpdateTaskHandler updateTaskHandler,
+        DeleteTaskHandler deleteTaskHandler,
         WorkspaceContext workspaceContext)
     {
         ArgumentNullException.ThrowIfNull(createTaskHandler);
@@ -49,6 +39,8 @@ public partial class TasksView : UserControl
         ArgumentNullException.ThrowIfNull(completeTaskHandler);
         ArgumentNullException.ThrowIfNull(reopenTaskHandler);
         ArgumentNullException.ThrowIfNull(getPreferencesHandler);
+        ArgumentNullException.ThrowIfNull(updateTaskHandler);
+        ArgumentNullException.ThrowIfNull(deleteTaskHandler);
         ArgumentNullException.ThrowIfNull(workspaceContext);
 
         _createTaskHandler = createTaskHandler;
@@ -56,8 +48,8 @@ public partial class TasksView : UserControl
         _completeTaskHandler = completeTaskHandler;
         _reopenTaskHandler = reopenTaskHandler;
         _getPreferencesHandler = getPreferencesHandler;
-        _updateTaskHandler = App.Services.GetRequiredService<UpdateTaskHandler>();
-        _deleteTaskHandler = App.Services.GetRequiredService<DeleteTaskHandler>();
+        _updateTaskHandler = updateTaskHandler;
+        _deleteTaskHandler = deleteTaskHandler;
         _workspaceContext = workspaceContext;
 
         InitializeComponent();

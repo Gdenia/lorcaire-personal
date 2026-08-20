@@ -5,7 +5,6 @@ using Lorcaire.Application.Notes.CreateNote;
 using Lorcaire.Application.Notes.GetNotes;
 using Lorcaire.Application.Notes.UpdateNote;
 using Lorcaire.Application.Notes.DeleteNote;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Lorcaire.Desktop.Views;
 
@@ -19,30 +18,23 @@ public partial class NotesView : UserControl
     private Guid? _selectedNoteId;
     private bool _deletePending;
 
-    public NotesView()
-        : this(
-            App.Services.GetRequiredService<CreateNoteHandler>(),
-            App.Services.GetRequiredService<GetNotesHandler>(),
-            App.Services.GetRequiredService<UpdateNoteHandler>(),
-            App.Services.GetRequiredService<WorkspaceContext>())
-    {
-    }
-
     public NotesView(
         CreateNoteHandler createNoteHandler,
         GetNotesHandler getNotesHandler,
         UpdateNoteHandler updateNoteHandler,
+        DeleteNoteHandler deleteNoteHandler,
         WorkspaceContext workspaceContext)
     {
         ArgumentNullException.ThrowIfNull(createNoteHandler);
         ArgumentNullException.ThrowIfNull(getNotesHandler);
         ArgumentNullException.ThrowIfNull(updateNoteHandler);
+        ArgumentNullException.ThrowIfNull(deleteNoteHandler);
         ArgumentNullException.ThrowIfNull(workspaceContext);
 
         _createNoteHandler = createNoteHandler;
         _getNotesHandler = getNotesHandler;
         _updateNoteHandler = updateNoteHandler;
-        _deleteNoteHandler=App.Services.GetRequiredService<DeleteNoteHandler>();
+        _deleteNoteHandler = deleteNoteHandler;
         _workspaceContext = workspaceContext;
 
         InitializeComponent();

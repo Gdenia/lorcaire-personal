@@ -6,12 +6,5 @@ public sealed record CalendarEventSummary(
     string Title,
     string? Description,
     DateTimeOffset StartAt,
-    DateTimeOffset? EndAt)
-{
-    public bool IsPast => (EndAt ?? StartAt) < DateTimeOffset.Now;
-
-    public string Schedule =>
-        EndAt is null
-            ? StartAt.ToString("g")
-            : $"{StartAt:g} – {EndAt:g}";
-}
+    DateTimeOffset? EndAt,
+    bool IsPast);

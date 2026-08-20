@@ -6,6 +6,9 @@ namespace Lorcaire.Infrastructure.Tests.Persistence.Memory;
 
 public sealed class InMemoryCalendarEventRepositoryTests
 {
+    private static readonly DateTimeOffset Now =
+        new(2026, 8, 20, 10, 0, 0, TimeSpan.Zero);
+
     [Fact]
     public async Task Repository_PersistsAndOrdersEventsChronologically()
     {
@@ -15,12 +18,12 @@ public sealed class InMemoryCalendarEventRepositoryTests
             CalendarEventId.New(),
             areaId,
             "First",
-            DateTimeOffset.Now.AddDays(1));
+            Now.AddDays(1));
         var second = new CalendarEvent(
             CalendarEventId.New(),
             areaId,
             "Second",
-            DateTimeOffset.Now.AddDays(2));
+            Now.AddDays(2));
         await repository.AddAsync(second);
         await repository.AddAsync(first);
 
@@ -40,7 +43,7 @@ public sealed class InMemoryCalendarEventRepositoryTests
             CalendarEventId.New(),
             AreaId.New(),
             "Event",
-            DateTimeOffset.Now);
+            Now);
         await repository.AddAsync(calendarEvent);
 
         await Assert.ThrowsAsync<InvalidOperationException>(

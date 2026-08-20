@@ -5,7 +5,6 @@ using Lorcaire.Application.Projects.CreateProject;
 using Lorcaire.Application.Projects.GetProjects;
 using Lorcaire.Application.Projects.DeleteProject;
 using Lorcaire.Application.Projects.UpdateProject;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Lorcaire.Desktop.Views;
 
@@ -20,27 +19,23 @@ public partial class ProjectsView : UserControl
     private Guid? _editingId;
     private Guid? _pendingDeleteId;
 
-    public ProjectsView()
-        : this(
-            App.Services.GetRequiredService<CreateProjectHandler>(),
-            App.Services.GetRequiredService<GetProjectsHandler>(),
-            App.Services.GetRequiredService<WorkspaceContext>())
-    {
-    }
-
     public ProjectsView(
         CreateProjectHandler createProjectHandler,
         GetProjectsHandler getProjectsHandler,
+        UpdateProjectHandler updateProjectHandler,
+        DeleteProjectHandler deleteProjectHandler,
         WorkspaceContext workspaceContext)
     {
         ArgumentNullException.ThrowIfNull(createProjectHandler);
         ArgumentNullException.ThrowIfNull(getProjectsHandler);
+        ArgumentNullException.ThrowIfNull(updateProjectHandler);
+        ArgumentNullException.ThrowIfNull(deleteProjectHandler);
         ArgumentNullException.ThrowIfNull(workspaceContext);
 
         _createProjectHandler = createProjectHandler;
         _getProjectsHandler = getProjectsHandler;
-        _updateProjectHandler = App.Services.GetRequiredService<UpdateProjectHandler>();
-        _deleteProjectHandler = App.Services.GetRequiredService<DeleteProjectHandler>();
+        _updateProjectHandler = updateProjectHandler;
+        _deleteProjectHandler = deleteProjectHandler;
         _workspaceContext = workspaceContext;
 
         InitializeComponent();

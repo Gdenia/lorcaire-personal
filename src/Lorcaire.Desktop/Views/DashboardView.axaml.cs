@@ -1,7 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Lorcaire.Application.Dashboard;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Lorcaire.Desktop.Views;
 
@@ -17,22 +16,21 @@ public enum DashboardDestination
 public partial class DashboardView : UserControl
 {
     private readonly GetDashboardHandler _getDashboardHandler;
+    private readonly TimeProvider _timeProvider;
     private readonly Action<DashboardDestination>? _navigate;
     private readonly Action<string>? _greetingChanged;
 
-    public DashboardView()
-        : this(App.Services.GetRequiredService<GetDashboardHandler>())
-    {
-    }
-
     public DashboardView(
         GetDashboardHandler getDashboardHandler,
+        TimeProvider timeProvider,
         Action<DashboardDestination>? navigate = null,
         Action<string>? greetingChanged = null)
     {
         ArgumentNullException.ThrowIfNull(getDashboardHandler);
+        ArgumentNullException.ThrowIfNull(timeProvider);
 
         _getDashboardHandler = getDashboardHandler;
+        _timeProvider = timeProvider;
         _navigate = navigate;
         _greetingChanged = greetingChanged;
 
@@ -53,8 +51,16 @@ public partial class DashboardView : UserControl
             ResourceCount.Text = dashboard.ResourceCount.ToString();
 
             PendingTasksList.ItemsSource = dashboard.PendingTasks;
-            UpcomingEventsList.ItemsSource = dashboard.UpcomingEvents;
-            RecentActivityList.ItemsSource = dashboard.RecentActivity;
+            UpcomingEventsList.ItemsSource = dashboard.UpcomingEvents
+                .Select(item => DashboardEventDisplayItem.Create(
+                    item,
+                    _timeProvider.LocalTimeZone))
+                .ToArray();
+            RecentActivityList.ItemsSource = dashboard.RecentActivity
+                .Select(item => DashboardActivityDisplayItem.Create(
+                    item,
+                    _timeProvider.LocalTimeZone))
+                .ToArray();
 
             TasksEmptyState.IsVisible = dashboard.PendingTasks.Count == 0;
             EventsEmptyState.IsVisible = dashboard.UpcomingEvents.Count == 0;

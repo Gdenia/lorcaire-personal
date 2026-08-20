@@ -65,6 +65,12 @@ public sealed class GetDashboardHandlerTests
             [
                 new CalendarEvent(CalendarEventId.New(), areaId, "Later", Now.AddDays(2)),
                 new CalendarEvent(CalendarEventId.New(), areaId, "Past", Now.AddMinutes(-1)),
+                new CalendarEvent(
+                    CalendarEventId.New(),
+                    areaId,
+                    "Ongoing",
+                    Now.AddHours(-1),
+                    Now.AddHours(1)),
                 new CalendarEvent(CalendarEventId.New(), areaId, "Soon", Now.AddHours(1))
             ],
             notes: [createdNote, updatedNote],
@@ -79,7 +85,9 @@ public sealed class GetDashboardHandlerTests
         Assert.Equal(2, summary.PendingTaskCount);
         Assert.Equal(1, summary.ResourceCount);
         Assert.Equal(["Alpha", "Zulu"], summary.PendingTasks.Select(task => task.Title));
-        Assert.Equal(["Soon", "Later"], summary.UpcomingEvents.Select(item => item.Title));
+        Assert.Equal(
+            ["Ongoing", "Soon", "Later"],
+            summary.UpcomingEvents.Select(item => item.Title));
         Assert.Equal(
             ["Note updated: Updated", "Note created: Created"],
             summary.RecentActivity.Select(item => item.Description));

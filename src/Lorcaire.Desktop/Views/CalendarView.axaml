@@ -1,7 +1,7 @@
 <UserControl
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:calendar="clr-namespace:Lorcaire.Application.Calendar.GetCalendarEvents;assembly=Lorcaire.Application"
+    xmlns:views="clr-namespace:Lorcaire.Desktop.Views"
     x:Class="Lorcaire.Desktop.Views.CalendarView">
 
   <Grid RowDefinitions="Auto,Auto,*" RowSpacing="22">
@@ -82,7 +82,7 @@
     <ScrollViewer Grid.Row="2">
       <ItemsControl x:Name="EventsList">
         <ItemsControl.ItemTemplate>
-          <DataTemplate x:DataType="calendar:CalendarEventSummary">
+          <DataTemplate x:DataType="views:CalendarEventDisplayItem">
             <Border
                 Margin="0,0,0,12"
                 Padding="20"
