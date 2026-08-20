@@ -55,6 +55,25 @@ public sealed class SqliteDatabaseInitializer
 
                 CREATE INDEX IF NOT EXISTS ix_goals_name
                     ON goals (name);
+
+                CREATE TABLE IF NOT EXISTS projects
+                (
+                    id          TEXT NOT NULL PRIMARY KEY,
+                    area_id     TEXT NOT NULL,
+                    name        TEXT NOT NULL,
+                    description TEXT NULL,
+
+                    FOREIGN KEY (area_id)
+                        REFERENCES areas (id)
+                        ON UPDATE RESTRICT
+                        ON DELETE RESTRICT
+                );
+
+                CREATE INDEX IF NOT EXISTS ix_projects_area_id
+                    ON projects (area_id);
+
+                CREATE INDEX IF NOT EXISTS ix_projects_name
+                    ON projects (name);
                 """;
 
             await schemaCommand.ExecuteNonQueryAsync(

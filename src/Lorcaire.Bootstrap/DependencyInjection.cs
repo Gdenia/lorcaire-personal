@@ -2,6 +2,9 @@ using Lorcaire.Application;
 using Lorcaire.Application.Goals.CreateGoal;
 using Lorcaire.Application.Goals.GetGoals;
 using Lorcaire.Application.Goals.Persistence;
+using Lorcaire.Application.Projects.CreateProject;
+using Lorcaire.Application.Projects.GetProjects;
+using Lorcaire.Application.Projects.Persistence;
 using Lorcaire.Core.Domain.Areas;
 using Lorcaire.Infrastructure.Persistence.Sqlite;
 using Microsoft.Extensions.DependencyInjection;
@@ -55,6 +58,21 @@ public static class DependencyInjection
 
         services.AddTransient<CreateGoalHandler>();
         services.AddTransient<GetGoalsHandler>();
+
+        services.AddSingleton<SqliteProjectRepository>();
+
+        services.AddSingleton<IProjectRepository>(
+            provider =>
+                provider.GetRequiredService<
+                    SqliteProjectRepository>());
+
+        services.AddSingleton<IProjectReader>(
+            provider =>
+                provider.GetRequiredService<
+                    SqliteProjectRepository>());
+
+        services.AddTransient<CreateProjectHandler>();
+        services.AddTransient<GetProjectsHandler>();
 
         return services.BuildServiceProvider();
     }

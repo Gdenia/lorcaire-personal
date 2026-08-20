@@ -1,0 +1,82 @@
+<UserControl
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:projects="clr-namespace:Lorcaire.Application.Projects.GetProjects;assembly=Lorcaire.Application"
+    x:Class="Lorcaire.Desktop.Views.ProjectsView">
+
+  <Grid RowDefinitions="Auto,Auto,*" RowSpacing="22">
+    <Border
+        Grid.Row="0"
+        Padding="24"
+        Background="#0F151B"
+        BorderBrush="#252D36"
+        BorderThickness="1"
+        CornerRadius="10">
+      <StackPanel Spacing="14">
+        <TextBlock
+            Text="Create a project"
+            Foreground="White"
+            FontSize="20"
+            FontWeight="SemiBold"/>
+        <TextBox
+            x:Name="ProjectName"
+            PlaceholderText="Project name"
+            MaxLength="200"/>
+        <TextBox
+            x:Name="ProjectDescription"
+            PlaceholderText="Description (optional)"
+            AcceptsReturn="True"
+            TextWrapping="Wrap"
+            MinHeight="80"
+            MaxLength="1000"/>
+        <Button
+            x:Name="CreateProjectButton"
+            Content="Create project"
+            Click="CreateProject"
+            HorizontalAlignment="Left"
+            Padding="22,10"
+            Background="#E8B04A"
+            Foreground="#080C11"/>
+        <TextBlock
+            x:Name="OperationMessage"
+            Foreground="#929AA5"
+            TextWrapping="Wrap"/>
+      </StackPanel>
+    </Border>
+
+    <TextBlock
+        Grid.Row="1"
+        Text="Your projects"
+        Foreground="White"
+        FontSize="20"
+        FontWeight="SemiBold"/>
+
+    <ScrollViewer Grid.Row="2">
+      <ItemsControl x:Name="ProjectsList">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="projects:ProjectSummary">
+            <Border
+                Margin="0,0,0,12"
+                Padding="20"
+                Background="#0F151B"
+                BorderBrush="#252D36"
+                BorderThickness="1"
+                CornerRadius="10">
+              <StackPanel Spacing="7">
+                <TextBlock
+                    Text="{Binding Name}"
+                    Foreground="White"
+                    FontSize="17"
+                    FontWeight="SemiBold"/>
+                <TextBlock
+                    Text="{Binding Description}"
+                    Foreground="#929AA5"
+                    TextWrapping="Wrap"/>
+              </StackPanel>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </ScrollViewer>
+  </Grid>
+</UserControl>

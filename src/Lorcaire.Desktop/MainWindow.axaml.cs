@@ -3,6 +3,8 @@ using Avalonia.Interactivity;
 using Lorcaire.Application;
 using Lorcaire.Application.Goals.CreateGoal;
 using Lorcaire.Application.Goals.GetGoals;
+using Lorcaire.Application.Projects.CreateProject;
+using Lorcaire.Application.Projects.GetProjects;
 using Lorcaire.Desktop.Views;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,6 +14,8 @@ public partial class MainWindow : Window
 {
     private readonly CreateGoalHandler _createGoalHandler;
     private readonly GetGoalsHandler _getGoalsHandler;
+    private readonly CreateProjectHandler _createProjectHandler;
+    private readonly GetProjectsHandler _getProjectsHandler;
     private readonly WorkspaceContext _workspaceContext;
 
     // Constructor requerido por Avalonia para localizar la ventana
@@ -20,6 +24,8 @@ public partial class MainWindow : Window
         : this(
             App.Services.GetRequiredService<CreateGoalHandler>(),
             App.Services.GetRequiredService<GetGoalsHandler>(),
+            App.Services.GetRequiredService<CreateProjectHandler>(),
+            App.Services.GetRequiredService<GetProjectsHandler>(),
             App.Services.GetRequiredService<WorkspaceContext>())
     {
     }
@@ -28,14 +34,20 @@ public partial class MainWindow : Window
     public MainWindow(
         CreateGoalHandler createGoalHandler,
         GetGoalsHandler getGoalsHandler,
+        CreateProjectHandler createProjectHandler,
+        GetProjectsHandler getProjectsHandler,
         WorkspaceContext workspaceContext)
     {
         ArgumentNullException.ThrowIfNull(createGoalHandler);
         ArgumentNullException.ThrowIfNull(getGoalsHandler);
+        ArgumentNullException.ThrowIfNull(createProjectHandler);
+        ArgumentNullException.ThrowIfNull(getProjectsHandler);
         ArgumentNullException.ThrowIfNull(workspaceContext);
 
         _createGoalHandler = createGoalHandler;
         _getGoalsHandler = getGoalsHandler;
+        _createProjectHandler = createProjectHandler;
+        _getProjectsHandler = getProjectsHandler;
         _workspaceContext = workspaceContext;
 
         InitializeComponent();
@@ -54,6 +66,7 @@ public partial class MainWindow : Window
         object? sender,
         RoutedEventArgs e)
     {
+        SetActiveNavigation(GoalsButton);
         PageTitle.Text = "Goals";
 
         PageContent.Content = new GoalsView(
@@ -66,13 +79,20 @@ public partial class MainWindow : Window
         object? sender,
         RoutedEventArgs e)
     {
-        ShowPlaceholder("Projects");
+        SetActiveNavigation(ProjectsButton);
+        PageTitle.Text = "Projects";
+
+        PageContent.Content = new ProjectsView(
+            _createProjectHandler,
+            _getProjectsHandler,
+            _workspaceContext);
     }
 
     private void ShowTasks(
         object? sender,
         RoutedEventArgs e)
     {
+        SetActiveNavigation(TasksButton);
         ShowPlaceholder("Tasks");
     }
 
@@ -80,6 +100,7 @@ public partial class MainWindow : Window
         object? sender,
         RoutedEventArgs e)
     {
+        SetActiveNavigation(ResourcesButton);
         ShowPlaceholder("Resources");
     }
 
@@ -87,6 +108,7 @@ public partial class MainWindow : Window
         object? sender,
         RoutedEventArgs e)
     {
+        SetActiveNavigation(CalendarButton);
         ShowPlaceholder("Calendar");
     }
 
@@ -94,6 +116,7 @@ public partial class MainWindow : Window
         object? sender,
         RoutedEventArgs e)
     {
+        SetActiveNavigation(NotesButton);
         ShowPlaceholder("Notes");
     }
 
@@ -101,6 +124,7 @@ public partial class MainWindow : Window
         object? sender,
         RoutedEventArgs e)
     {
+        SetActiveNavigation(SettingsButton);
         ShowPlaceholder("Settings");
     }
 
@@ -108,13 +132,36 @@ public partial class MainWindow : Window
         object? sender,
         RoutedEventArgs e)
     {
+        SetActiveNavigation(AboutButton);
         ShowPlaceholder("About");
     }
 
     private void ShowDashboardView()
     {
+        SetActiveNavigation(DashboardButton);
         PageTitle.Text = "Dashboard";
         PageContent.Content = new DashboardView();
+    }
+
+    private void SetActiveNavigation(Button activeButton)
+    {
+        Button[] navigationButtons =
+        [
+            DashboardButton,
+            GoalsButton,
+            ProjectsButton,
+            TasksButton,
+            ResourcesButton,
+            CalendarButton,
+            NotesButton,
+            SettingsButton,
+            AboutButton
+        ];
+
+        foreach (var button in navigationButtons)
+        {
+            button.Classes.Set("Selected", button == activeButton);
+        }
     }
 
     private void ShowPlaceholder(string title)

@@ -9,6 +9,23 @@
     Title="Lorcaire Personal Edition"
     Background="#080C11">
 
+    <Window.Styles>
+        <Style Selector="Button.SidebarButton.Selected /template/ ContentPresenter">
+            <Setter Property="Background" Value="#171B20"/>
+            <Setter Property="Foreground" Value="#E8B04A"/>
+        </Style>
+
+        <Style Selector="Button.SidebarButton:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#171B20"/>
+            <Setter Property="Foreground" Value="#E8B04A"/>
+        </Style>
+
+        <Style Selector="Button.SidebarButton:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="#20262D"/>
+            <Setter Property="Foreground" Value="#E8B04A"/>
+        </Style>
+    </Window.Styles>
+
     <Grid ColumnDefinitions="220,*">
 
         <!-- SIDEBAR -->
@@ -43,18 +60,22 @@
                     Margin="12,0">
 
                     <Button
+                        x:Name="DashboardButton"
+                        Classes="SidebarButton"
                         Content="Dashboard"
                         Click="ShowDashboard"
                         Height="46"
                         HorizontalContentAlignment="Left"
                         Padding="18,0"
-                        Background="#171B20"
-                        Foreground="#E8B04A"
+                        Background="Transparent"
+                        Foreground="#D5D9DE"
                         BorderThickness="0"
                         CornerRadius="7"
                         FontSize="15"/>
 
                     <Button
+                        x:Name="GoalsButton"
+                        Classes="SidebarButton"
                         Content="Goals"
                         Click="ShowGoals"
                         Height="46"
@@ -66,6 +87,8 @@
                         FontSize="15"/>
 
                     <Button
+                        x:Name="ProjectsButton"
+                        Classes="SidebarButton"
                         Content="Projects"
                         Click="ShowProjects"
                         Height="46"
@@ -77,6 +100,8 @@
                         FontSize="15"/>
 
                     <Button
+                        x:Name="TasksButton"
+                        Classes="SidebarButton"
                         Content="Tasks"
                         Click="ShowTasks"
                         Height="46"
@@ -88,6 +113,8 @@
                         FontSize="15"/>
 
                     <Button
+                        x:Name="ResourcesButton"
+                        Classes="SidebarButton"
                         Content="Resources"
                         Click="ShowResources"
                         Height="46"
@@ -99,6 +126,8 @@
                         FontSize="15"/>
 
                     <Button
+                        x:Name="CalendarButton"
+                        Classes="SidebarButton"
                         Content="Calendar"
                         Click="ShowCalendar"
                         Height="46"
@@ -110,6 +139,8 @@
                         FontSize="15"/>
 
                     <Button
+                        x:Name="NotesButton"
+                        Classes="SidebarButton"
                         Content="Notes"
                         Click="ShowNotes"
                         Height="46"
@@ -133,6 +164,8 @@
                         Margin="10,0,10,12"/>
 
                     <Button
+                        x:Name="SettingsButton"
+                        Classes="SidebarButton"
                         Content="Settings"
                         Click="ShowSettings"
                         Height="42"
@@ -143,6 +176,8 @@
                         BorderThickness="0"/>
 
                     <Button
+                        x:Name="AboutButton"
+                        Classes="SidebarButton"
                         Content="About"
                         Click="ShowAbout"
                         Height="42"
