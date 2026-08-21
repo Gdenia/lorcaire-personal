@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using Lorcaire.Application.Notes.Persistence;
+using Lorcaire.Application.Errors;
 using Lorcaire.Core.Domain.Notes;
 
 namespace Lorcaire.Infrastructure.Persistence.Memory;
@@ -17,8 +18,8 @@ public sealed class InMemoryNoteRepository : INoteRepository, INoteReader
 
         if (!_notes.TryAdd(note.Id, note))
         {
-            throw new InvalidOperationException(
-                $"Ya existe una nota con identificador '{note.Id}'.");
+            throw new ConflictException(
+                "A note with the same identifier already exists.");
         }
 
         return Task.CompletedTask;
@@ -42,8 +43,8 @@ public sealed class InMemoryNoteRepository : INoteRepository, INoteReader
 
         if (!_notes.ContainsKey(note.Id))
         {
-            throw new InvalidOperationException(
-                $"No existe una nota con identificador '{note.Id}'.");
+            throw new ConflictException(
+                "The note could not be updated because it no longer exists.");
         }
 
         _notes[note.Id] = note;

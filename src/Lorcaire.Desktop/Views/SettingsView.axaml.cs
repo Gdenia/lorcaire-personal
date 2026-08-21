@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Lorcaire.Application.Settings;
+using Lorcaire.Desktop.Presentation;
 
 namespace Lorcaire.Desktop.Views;
 
@@ -23,6 +24,7 @@ public partial class SettingsView : UserControl
         _preferencesSaved = preferencesSaved;
 
         InitializeComponent();
+        DisplayName.MaxLength = UserPreferences.MaximumDisplayNameLength;
         Loaded += LoadSettings;
     }
 
@@ -34,8 +36,9 @@ public partial class SettingsView : UserControl
         }
         catch (Exception exception)
         {
-            OperationMessage.Text =
-                $"Unable to load settings: {exception.Message}";
+            OperationMessage.Text = UserErrorMessages.Format(
+                "Unable to load settings",
+                exception);
         }
     }
 
@@ -58,8 +61,9 @@ public partial class SettingsView : UserControl
         }
         catch (Exception exception)
         {
-            OperationMessage.Text =
-                $"Unable to save settings: {exception.Message}";
+            OperationMessage.Text = UserErrorMessages.Format(
+                "Unable to save settings",
+                exception);
         }
         finally
         {

@@ -22,7 +22,7 @@ public sealed class LocalDateTimeResolverTests
     [Fact]
     public void ResolveToUtc_RejectsLocalTimeSkippedByDst()
     {
-        var exception = Assert.Throws<InvalidOperationException>(() =>
+        var exception = Assert.Throws<ArgumentException>(() =>
             LocalDateTimeResolver.ResolveToUtc(
                 new DateTime(2026, 3, 29),
                 new TimeSpan(2, 30, 0),

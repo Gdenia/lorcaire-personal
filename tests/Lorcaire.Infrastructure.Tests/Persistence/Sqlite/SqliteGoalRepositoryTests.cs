@@ -1,6 +1,9 @@
 using Lorcaire.Core.Domain.Areas;
 using Lorcaire.Core.Domain.Goals;
 using Lorcaire.Infrastructure.Persistence.Sqlite;
+using Lorcaire.Application.Errors;
+using Lorcaire.Application.Goals.UpdateGoal;
+using Lorcaire.Core.Domain;
 
 namespace Lorcaire.Infrastructure.Tests.Persistence.Sqlite;
 
@@ -48,8 +51,38 @@ public sealed class SqliteGoalRepositoryTests
         var repository = new SqliteGoalRepository(database.ConnectionFactory);
         var goal = new Goal(GoalId.New(), database.DefaultAreaId, "Missing");
 
-        await Assert.ThrowsAsync<InvalidOperationException>(
+        var exception = await Assert.ThrowsAsync<ConflictException>(
             () => repository.UpdateAsync(goal));
+
+        Assert.DoesNotContain("SQLite", exception.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task FailedApplicationUpdate_PreservesPersistedGoal()
+    {
+        await using var database = await TemporaryDatabase.CreateAsync();
+        var repository = new SqliteGoalRepository(database.ConnectionFactory);
+        var goal = new Goal(
+            GoalId.New(),
+            database.DefaultAreaId,
+            "Original",
+            "Before",
+            isCompleted: true);
+        await repository.AddAsync(goal);
+
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            new UpdateGoalHandler(repository).HandleAsync(new(
+                goal.Id.Value,
+                "Changed",
+                new string(
+                    'x',
+                    DomainTextLimits.DescriptionMaximumLength + 1))));
+
+        var stored = await repository.GetByIdAsync(goal.Id);
+        Assert.NotNull(stored);
+        Assert.Equal("Original", stored.Name);
+        Assert.Equal("Before", stored.Description);
+        Assert.True(stored.IsCompleted);
     }
 
     private sealed class TemporaryDatabase : IAsyncDisposable

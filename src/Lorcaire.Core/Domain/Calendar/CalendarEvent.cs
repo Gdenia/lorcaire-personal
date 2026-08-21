@@ -19,6 +19,8 @@ public sealed class CalendarEvent
         DateTimeOffset? endAt = null,
         string? description = null)
     {
+        DomainValidation.EnsureIdentifier(id.Value, "calendar event", nameof(id));
+        DomainValidation.EnsureIdentifier(areaId.Value, "area", nameof(areaId));
         Id = id;
         AreaId = areaId;
         Title = ValidateTitle(title);
@@ -40,16 +42,29 @@ public sealed class CalendarEvent
         EndAt = endAt?.ToUniversalTime();
     }
 
+    public void UpdateDetails(
+        string title,
+        string? description,
+        DateTimeOffset startAt,
+        DateTimeOffset? endAt = null)
+    {
+        var validatedTitle = ValidateTitle(title);
+        var validatedDescription = NormalizeDescription(description);
+        ValidateSchedule(startAt, endAt);
+
+        Title = validatedTitle;
+        Description = validatedDescription;
+        StartAt = startAt.ToUniversalTime();
+        EndAt = endAt?.ToUniversalTime();
+    }
+
     private static string ValidateTitle(string title)
     {
-        if (string.IsNullOrWhiteSpace(title))
-        {
-            throw new ArgumentException(
-                "El evento debe tener un título.",
-                nameof(title));
-        }
-
-        return title.Trim();
+        return DomainValidation.RequiredText(
+            title,
+            DomainTextLimits.TitleMaximumLength,
+            "event title",
+            nameof(title));
     }
 
     private static void ValidateSchedule(
@@ -59,11 +74,15 @@ public sealed class CalendarEvent
         if (endAt < startAt)
         {
             throw new ArgumentException(
-                "La finalización del evento no puede ser anterior al inicio.",
+                "The event end cannot be earlier than its start.",
                 nameof(endAt));
         }
     }
 
     private static string? NormalizeDescription(string? description) =>
-        string.IsNullOrWhiteSpace(description) ? null : description.Trim();
+        DomainValidation.OptionalText(
+            description,
+            DomainTextLimits.DescriptionMaximumLength,
+            "event description",
+            nameof(description));
 }

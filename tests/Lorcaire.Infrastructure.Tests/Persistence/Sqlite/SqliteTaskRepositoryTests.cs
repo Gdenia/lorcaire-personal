@@ -58,7 +58,7 @@ public sealed class SqliteTaskRepositoryTests
         var repository = new SqliteTaskRepository(database.ConnectionFactory);
         var task = new DomainTask(TaskId.New(), AreaId.New(), "Tarea");
 
-        await Assert.ThrowsAsync<InvalidOperationException>(
+        await Assert.ThrowsAsync<ConflictException>(
             () => repository.AddAsync(task));
     }
 
@@ -73,7 +73,7 @@ public sealed class SqliteTaskRepositoryTests
             "Tarea");
         await repository.AddAsync(task);
 
-        await Assert.ThrowsAsync<InvalidOperationException>(
+        await Assert.ThrowsAsync<ConflictException>(
             () => repository.AddAsync(task));
     }
 
@@ -87,7 +87,7 @@ public sealed class SqliteTaskRepositoryTests
             database.DefaultAreaId,
             "Tarea");
 
-        await Assert.ThrowsAsync<InvalidOperationException>(
+        await Assert.ThrowsAsync<ConflictException>(
             () => repository.UpdateAsync(task));
     }
 

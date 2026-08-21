@@ -8,8 +8,7 @@ public sealed class UpdateProjectHandler(IProjectRepository repository)
         ArgumentNullException.ThrowIfNull(command);
         var project = await repository.GetByIdAsync(new ProjectId(command.ProjectId), cancellationToken)
             ?? throw new ProjectNotFoundException(command.ProjectId);
-        project.Rename(command.Name);
-        project.ChangeDescription(command.Description);
+        project.UpdateDetails(command.Name, command.Description);
         await repository.UpdateAsync(project, cancellationToken);
     }
 }

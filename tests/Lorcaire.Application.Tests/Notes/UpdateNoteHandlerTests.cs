@@ -62,6 +62,8 @@ public sealed class UpdateNoteHandlerTests
             new UpdateNoteHandler(repository, TimeProvider.System)
                 .HandleAsync(
                     new UpdateNoteCommand(note.Id.Value, "Title", " ")));
+        Assert.Equal("Title", note.Title);
+        Assert.Equal("Content", note.Content);
         Assert.Equal(0, repository.UpdateCount);
     }
 

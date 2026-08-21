@@ -8,8 +8,8 @@
     <Border Grid.Row="0" Padding="24" Background="#0F151B" BorderBrush="#252D36" BorderThickness="1" CornerRadius="10">
       <StackPanel Spacing="14">
         <TextBlock x:Name="FormTitle" Text="Create a goal" Foreground="White" FontSize="20" FontWeight="SemiBold"/>
-        <TextBox x:Name="GoalName" PlaceholderText="Desired result" MaxLength="200"/>
-        <TextBox x:Name="GoalDescription" PlaceholderText="Description (optional)" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="80" MaxLength="1000"/>
+        <TextBox x:Name="GoalName" PlaceholderText="Desired result"/>
+        <TextBox x:Name="GoalDescription" PlaceholderText="Description (optional)" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="80"/>
         <StackPanel Orientation="Horizontal" Spacing="10">
           <Button x:Name="CreateGoalButton" Content="Create goal" Click="CreateGoal" Padding="22,10" Background="#E8B04A" Foreground="#080C11"/>
           <Button x:Name="SaveGoalButton" Content="Save changes" Click="SaveGoal" IsVisible="False" Padding="22,10" Background="#E8B04A" Foreground="#080C11"/>

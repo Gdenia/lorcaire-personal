@@ -6,6 +6,8 @@ using Lorcaire.Application.Calendar.GetCalendarEvents;
 using Lorcaire.Application.Calendar.UpdateCalendarEvent;
 using Lorcaire.Application.Calendar.DeleteCalendarEvent;
 using Lorcaire.Desktop.Time;
+using Lorcaire.Desktop.Presentation;
+using Lorcaire.Core.Domain;
 
 namespace Lorcaire.Desktop.Views;
 
@@ -42,14 +44,16 @@ public partial class CalendarView : UserControl
         _workspaceContext = workspaceContext;
 
         InitializeComponent();
+        EventTitle.MaxLength = DomainTextLimits.TitleMaximumLength;
+        EventDescription.MaxLength = DomainTextLimits.DescriptionMaximumLength;
         SetDefaultSchedule();
         Loaded += LoadEvents;
     }
     private void BeginEdit(object? sender,RoutedEventArgs e){if(sender is not Button{Tag:Guid id})return;var x=_events.Single(i=>i.Id==id);_editingId=id;EventTitle.Text=x.Title;EventDescription.Text=x.Description;StartDate.SelectedDate=x.LocalStartAt.Date;StartTime.SelectedTime=x.LocalStartAt.TimeOfDay;HasEndTime.IsChecked=x.LocalEndAt is not null;if(x.LocalEndAt is DateTimeOffset end){EndDate.SelectedDate=end.Date;EndTime.SelectedTime=end.TimeOfDay;}FormTitle.Text="Edit event";CreateEventButton.IsVisible=false;SaveEventButton.IsVisible=true;CancelEventButton.IsVisible=true;}
-    private async void SaveEvent(object? sender,RoutedEventArgs e){if(_editingId is not Guid id)return;try{var start=BuildDateTime(StartDate,StartTime);var end=HasEndTime.IsChecked==true?BuildDateTime(EndDate,EndTime):(DateTimeOffset?)null;await _updateEventHandler.HandleAsync(new(id,EventTitle.Text??"",EventDescription.Text,start,end));ResetForm();await RefreshEventsAsync();OperationMessage.Text="Event updated.";}catch(Exception ex){OperationMessage.Text=$"Unable to update event: {ex.Message}";}}
+    private async void SaveEvent(object? sender,RoutedEventArgs e){if(_editingId is not Guid id)return;try{var start=BuildDateTime(StartDate,StartTime);var end=HasEndTime.IsChecked==true?BuildDateTime(EndDate,EndTime):(DateTimeOffset?)null;await _updateEventHandler.HandleAsync(new(id,EventTitle.Text??"",EventDescription.Text,start,end));ResetForm();await RefreshEventsAsync();OperationMessage.Text="Event updated.";}catch(Exception ex){OperationMessage.Text=UserErrorMessages.Format("Unable to update event",ex);}}
     private void CancelEdit(object? sender,RoutedEventArgs e)=>ResetForm();
     private void DeleteEvent(object? sender,RoutedEventArgs e){if(sender is not Button{Tag:Guid id})return;_pendingDeleteId=id;ConfirmDeleteButton.IsVisible=true;CancelDeleteButton.IsVisible=true;OperationMessage.Text="Confirm or cancel the deletion.";}
-    private async void ConfirmDelete(object? sender,RoutedEventArgs e){if(_pendingDeleteId is not Guid id)return;try{await _deleteEventHandler.HandleAsync(id);if(_editingId==id)ResetForm();await RefreshEventsAsync();OperationMessage.Text="Event deleted.";}catch(Exception ex){OperationMessage.Text=$"Unable to delete event: {ex.Message}";}finally{ClearDelete();}}
+    private async void ConfirmDelete(object? sender,RoutedEventArgs e){if(_pendingDeleteId is not Guid id)return;try{await _deleteEventHandler.HandleAsync(id);if(_editingId==id)ResetForm();await RefreshEventsAsync();OperationMessage.Text="Event deleted.";}catch(Exception ex){OperationMessage.Text=UserErrorMessages.Format("Unable to delete event",ex);}finally{ClearDelete();}}
     private void CancelDelete(object? sender,RoutedEventArgs e){ClearDelete();OperationMessage.Text="Deletion cancelled.";}private void ClearDelete(){_pendingDeleteId=null;ConfirmDeleteButton.IsVisible=false;CancelDeleteButton.IsVisible=false;}private void ResetForm(){_editingId=null;EventTitle.Text="";EventDescription.Text="";HasEndTime.IsChecked=false;SetDefaultSchedule();FormTitle.Text="Create an event";CreateEventButton.IsVisible=true;SaveEventButton.IsVisible=false;CancelEventButton.IsVisible=false;}
 
     private async void LoadEvents(object? sender, RoutedEventArgs e)
@@ -60,8 +64,9 @@ public partial class CalendarView : UserControl
         }
         catch (Exception exception)
         {
-            OperationMessage.Text =
-                $"Unable to load events: {exception.Message}";
+            OperationMessage.Text = UserErrorMessages.Format(
+                "Unable to load events",
+                exception);
         }
     }
 
@@ -94,8 +99,9 @@ public partial class CalendarView : UserControl
         }
         catch (Exception exception)
         {
-            OperationMessage.Text =
-                $"Unable to create event: {exception.Message}";
+            OperationMessage.Text = UserErrorMessages.Format(
+                "Unable to create event",
+                exception);
         }
         finally
         {
@@ -108,9 +114,9 @@ public partial class CalendarView : UserControl
         TimePicker timePicker)
     {
         var date = datePicker.SelectedDate
-            ?? throw new InvalidOperationException("Select a date.");
+            ?? throw new ArgumentException("Select a date.");
         var time = timePicker.SelectedTime
-            ?? throw new InvalidOperationException("Select a time.");
+            ?? throw new ArgumentException("Select a time.");
 
         return LocalDateTimeResolver.ResolveToUtc(
             date.Date,

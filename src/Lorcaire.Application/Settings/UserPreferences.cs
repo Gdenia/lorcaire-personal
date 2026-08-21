@@ -19,7 +19,7 @@ public sealed record UserPreferences
         if (string.IsNullOrWhiteSpace(displayName))
         {
             throw new ArgumentException(
-                "El nombre mostrado es obligatorio.",
+                "The display name is required.",
                 nameof(displayName));
         }
 
@@ -28,8 +28,8 @@ public sealed record UserPreferences
         if (normalizedDisplayName.Length > MaximumDisplayNameLength)
         {
             throw new ArgumentException(
-                $"El nombre mostrado no puede superar " +
-                $"{MaximumDisplayNameLength} caracteres.",
+                $"The display name cannot exceed " +
+                $"{MaximumDisplayNameLength} characters.",
                 nameof(displayName));
         }
 
@@ -38,7 +38,7 @@ public sealed record UserPreferences
             throw new ArgumentOutOfRangeException(
                 nameof(theme),
                 theme,
-                "El tema solicitado no está disponible.");
+                "The requested theme is not available.");
         }
 
         DisplayName = normalizedDisplayName;

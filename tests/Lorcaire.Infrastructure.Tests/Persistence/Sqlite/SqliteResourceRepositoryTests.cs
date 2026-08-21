@@ -41,7 +41,7 @@ public sealed class SqliteResourceRepositoryTests
             "Resource",
             "Book");
 
-        await Assert.ThrowsAsync<InvalidOperationException>(
+        await Assert.ThrowsAsync<ConflictException>(
             () => repository.AddAsync(resource));
     }
 
@@ -57,7 +57,7 @@ public sealed class SqliteResourceRepositoryTests
             "Book");
         await repository.AddAsync(resource);
 
-        await Assert.ThrowsAsync<InvalidOperationException>(
+        await Assert.ThrowsAsync<ConflictException>(
             () => repository.AddAsync(resource));
     }
 

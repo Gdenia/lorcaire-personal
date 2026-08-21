@@ -60,7 +60,7 @@ public sealed class InMemoryGoalReaderTests
         var repository = new InMemoryGoalRepository();
         var goal = new Goal(GoalId.New(), AreaId.New(), "Missing");
 
-        await Assert.ThrowsAsync<InvalidOperationException>(
+        await Assert.ThrowsAsync<ConflictException>(
             () => repository.UpdateAsync(goal));
     }
 }

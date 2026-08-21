@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using Lorcaire.Application.Calendar.Persistence;
+using Lorcaire.Application.Errors;
 using Lorcaire.Core.Domain.Calendar;
 
 namespace Lorcaire.Infrastructure.Persistence.Memory;
@@ -20,8 +21,8 @@ public sealed class InMemoryCalendarEventRepository :
 
         if (!_events.TryAdd(calendarEvent.Id, calendarEvent))
         {
-            throw new InvalidOperationException(
-                $"Ya existe un evento con identificador '{calendarEvent.Id}'.");
+            throw new ConflictException(
+                "A calendar event with the same identifier already exists.");
         }
 
         return Task.CompletedTask;
@@ -38,6 +39,6 @@ public sealed class InMemoryCalendarEventRepository :
         return Task.FromResult(events);
     }
     public Task<CalendarEvent?> GetByIdAsync(CalendarEventId id,CancellationToken c=default){c.ThrowIfCancellationRequested();_events.TryGetValue(id,out var x);return Task.FromResult(x);}
-    public Task UpdateAsync(CalendarEvent x,CancellationToken c=default){ArgumentNullException.ThrowIfNull(x);c.ThrowIfCancellationRequested();if(!_events.ContainsKey(x.Id))throw new InvalidOperationException($"No existe un evento con identificador '{x.Id}'.");_events[x.Id]=x;return Task.CompletedTask;}
+    public Task UpdateAsync(CalendarEvent x,CancellationToken c=default){ArgumentNullException.ThrowIfNull(x);c.ThrowIfCancellationRequested();if(!_events.ContainsKey(x.Id))throw new ConflictException("The calendar event could not be updated because it no longer exists.");_events[x.Id]=x;return Task.CompletedTask;}
     public Task<bool> DeleteAsync(CalendarEventId id,CancellationToken c=default){c.ThrowIfCancellationRequested();return Task.FromResult(_events.TryRemove(id,out _));}
 }

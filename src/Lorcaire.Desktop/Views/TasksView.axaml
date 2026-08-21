@@ -21,14 +21,14 @@
         <TextBox
             x:Name="TaskTitle"
             PlaceholderText="Task title"
-            MaxLength="200"/>
+            />
         <TextBox
             x:Name="TaskDescription"
             PlaceholderText="Description (optional)"
             AcceptsReturn="True"
             TextWrapping="Wrap"
             MinHeight="80"
-            MaxLength="1000"/>
+            />
         <StackPanel Orientation="Horizontal" Spacing="10"><Button
             x:Name="CreateTaskButton"
             Content="Create task"

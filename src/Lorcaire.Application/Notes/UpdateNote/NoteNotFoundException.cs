@@ -1,11 +1,13 @@
+using Lorcaire.Application.Errors;
+
 namespace Lorcaire.Application.Notes.UpdateNote;
 
-public sealed class NoteNotFoundException : Exception
+public sealed class NoteNotFoundException : NotFoundException
 {
     public Guid NoteId { get; }
 
     public NoteNotFoundException(Guid noteId)
-        : base($"No existe la nota con identificador '{noteId}'.")
+        : base($"No note exists with identifier '{noteId}'.")
     {
         NoteId = noteId;
     }

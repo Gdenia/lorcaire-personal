@@ -9,7 +9,7 @@ public readonly record struct GoalId
         if (value == Guid.Empty)
         {
             throw new ArgumentException(
-                "El identificador del objetivo no puede estar vacío.",
+                "The goal identifier cannot be empty.",
                 nameof(value));
         }
 

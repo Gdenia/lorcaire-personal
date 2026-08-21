@@ -39,7 +39,7 @@ public sealed class SqliteNoteRepository : INoteRepository, INoteReader
         }
         catch (SqliteException exception) when (exception.SqliteErrorCode == 19)
         {
-            throw CreateIntegrityException(exception);
+            throw SqlitePersistenceErrors.SaveConflict("note", exception);
         }
     }
 
@@ -80,12 +80,16 @@ public sealed class SqliteNoteRepository : INoteRepository, INoteReader
             WHERE id = $id;
             """;
         AddParameters(command, note);
-        var affectedRows = await command.ExecuteNonQueryAsync(cancellationToken);
-
-        if (affectedRows == 0)
+        try
         {
-            throw new InvalidOperationException(
-                $"No existe una nota con identificador '{note.Id}'.");
+            if (await command.ExecuteNonQueryAsync(cancellationToken) == 0)
+            {
+                throw SqlitePersistenceErrors.MissingDuringUpdate("note");
+            }
+        }
+        catch (SqliteException exception) when (exception.SqliteErrorCode == 19)
+        {
+            throw SqlitePersistenceErrors.SaveConflict("note", exception);
         }
     }
 
@@ -109,7 +113,7 @@ public sealed class SqliteNoteRepository : INoteRepository, INoteReader
         }
         return notes;
     }
-    public async Task<bool> DeleteAsync(NoteId id,CancellationToken c=default){await using var connection=_connectionFactory.CreateConnection();await connection.OpenAsync(c);await using var command=connection.CreateCommand();command.CommandText="DELETE FROM notes WHERE id=$id;";command.Parameters.AddWithValue("$id",id.Value.ToString());try{return await command.ExecuteNonQueryAsync(c)==1;}catch(SqliteException ex)when(ex.SqliteErrorCode==19){throw new InvalidOperationException("The note cannot be deleted because other information depends on it.",ex);}}
+    public async Task<bool> DeleteAsync(NoteId id,CancellationToken c=default){await using var connection=_connectionFactory.CreateConnection();await connection.OpenAsync(c);await using var command=connection.CreateCommand();command.CommandText="DELETE FROM notes WHERE id=$id;";command.Parameters.AddWithValue("$id",id.Value.ToString());try{return await command.ExecuteNonQueryAsync(c)==1;}catch(SqliteException ex)when(ex.SqliteErrorCode==19){throw SqlitePersistenceErrors.DeleteConflict("note",ex);}}
 
     private static Note ReadNote(SqliteDataReader reader) =>
         new(
@@ -140,10 +144,4 @@ public sealed class SqliteNoteRepository : INoteRepository, INoteReader
             note.LastModifiedAt.ToString("O", CultureInfo.InvariantCulture));
     }
 
-    private static InvalidOperationException CreateIntegrityException(
-        SqliteException exception) =>
-        new(
-            "No se pudo guardar la nota porque sus datos " +
-            "incumplen una restricción de integridad.",
-            exception);
 }

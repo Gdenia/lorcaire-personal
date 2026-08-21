@@ -62,7 +62,7 @@ public sealed class InMemoryNoteRepositoryTests
             DateTimeOffset.UtcNow);
         await repository.AddAsync(note);
 
-        await Assert.ThrowsAsync<InvalidOperationException>(
+        await Assert.ThrowsAsync<ConflictException>(
             () => repository.AddAsync(note));
     }
 }

@@ -21,6 +21,8 @@ public sealed class Goal
         string? description = null,
         bool isCompleted = false)
     {
+        DomainValidation.EnsureIdentifier(id.Value, "goal", nameof(id));
+        DomainValidation.EnsureIdentifier(areaId.Value, "area", nameof(areaId));
         Id = id;
         AreaId = areaId;
         Name = ValidateName(name);
@@ -38,6 +40,15 @@ public sealed class Goal
         Description = NormalizeDescription(description);
     }
 
+    public void UpdateDetails(string name, string? description)
+    {
+        var validatedName = ValidateName(name);
+        var validatedDescription = NormalizeDescription(description);
+
+        Name = validatedName;
+        Description = validatedDescription;
+    }
+
     public void Complete()
     {
         IsCompleted = true;
@@ -50,20 +61,19 @@ public sealed class Goal
 
     private static string ValidateName(string name)
     {
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            throw new ArgumentException(
-                "El objetivo debe tener un nombre.",
-                nameof(name));
-        }
-
-        return name.Trim();
+        return DomainValidation.RequiredText(
+            name,
+            DomainTextLimits.NameMaximumLength,
+            "goal name",
+            nameof(name));
     }
 
     private static string? NormalizeDescription(string? description)
     {
-        return string.IsNullOrWhiteSpace(description)
-            ? null
-            : description.Trim();
+        return DomainValidation.OptionalText(
+            description,
+            DomainTextLimits.DescriptionMaximumLength,
+            "goal description",
+            nameof(description));
     }
 }

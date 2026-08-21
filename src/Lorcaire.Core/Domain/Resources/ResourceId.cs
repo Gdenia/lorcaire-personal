@@ -9,7 +9,7 @@ public readonly record struct ResourceId
         if (value == Guid.Empty)
         {
             throw new ArgumentException(
-                "El identificador del recurso no puede estar vacío.",
+                "The resource identifier cannot be empty.",
                 nameof(value));
         }
 

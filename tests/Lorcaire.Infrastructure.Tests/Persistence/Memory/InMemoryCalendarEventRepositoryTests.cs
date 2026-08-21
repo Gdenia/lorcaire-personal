@@ -46,7 +46,7 @@ public sealed class InMemoryCalendarEventRepositoryTests
             Now);
         await repository.AddAsync(calendarEvent);
 
-        await Assert.ThrowsAsync<InvalidOperationException>(
+        await Assert.ThrowsAsync<ConflictException>(
             () => repository.AddAsync(calendarEvent));
     }
 }

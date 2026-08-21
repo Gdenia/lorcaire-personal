@@ -37,7 +37,7 @@ public sealed class SqliteTaskRepository : ITaskRepository, ITaskReader
         }
         catch (SqliteException exception) when (exception.SqliteErrorCode == 19)
         {
-            throw CreateIntegrityException(exception);
+            throw SqlitePersistenceErrors.SaveConflict("task", exception);
         }
     }
 
@@ -77,12 +77,16 @@ public sealed class SqliteTaskRepository : ITaskRepository, ITaskReader
             WHERE id = $id;
             """;
         AddParameters(command, task);
-        var affectedRows = await command.ExecuteNonQueryAsync(cancellationToken);
-
-        if (affectedRows == 0)
+        try
         {
-            throw new InvalidOperationException(
-                $"No existe una tarea con identificador '{task.Id}'.");
+            if (await command.ExecuteNonQueryAsync(cancellationToken) == 0)
+            {
+                throw SqlitePersistenceErrors.MissingDuringUpdate("task");
+            }
+        }
+        catch (SqliteException exception) when (exception.SqliteErrorCode == 19)
+        {
+            throw SqlitePersistenceErrors.SaveConflict("task", exception);
         }
     }
 
@@ -107,7 +111,7 @@ public sealed class SqliteTaskRepository : ITaskRepository, ITaskReader
         return tasks;
     }
     public async System.Threading.Tasks.Task<bool> DeleteAsync(TaskId id,CancellationToken cancellationToken=default)
-    { await using var connection=_connectionFactory.CreateConnection();await connection.OpenAsync(cancellationToken);await using var command=connection.CreateCommand();command.CommandText="DELETE FROM tasks WHERE id=$id;";command.Parameters.AddWithValue("$id",id.Value.ToString());try{return await command.ExecuteNonQueryAsync(cancellationToken)==1;}catch(SqliteException ex) when(ex.SqliteErrorCode==19){throw new InvalidOperationException("The task cannot be deleted because other information depends on it.",ex);} }
+    { await using var connection=_connectionFactory.CreateConnection();await connection.OpenAsync(cancellationToken);await using var command=connection.CreateCommand();command.CommandText="DELETE FROM tasks WHERE id=$id;";command.Parameters.AddWithValue("$id",id.Value.ToString());try{return await command.ExecuteNonQueryAsync(cancellationToken)==1;}catch(SqliteException ex) when(ex.SqliteErrorCode==19){throw SqlitePersistenceErrors.DeleteConflict("task",ex);} }
 
     private static DomainTask ReadTask(SqliteDataReader reader) =>
         new(
@@ -130,10 +134,4 @@ public sealed class SqliteTaskRepository : ITaskRepository, ITaskReader
         command.Parameters.AddWithValue("$isCompleted", task.IsCompleted ? 1 : 0);
     }
 
-    private static InvalidOperationException CreateIntegrityException(
-        SqliteException exception) =>
-        new(
-            "No se pudo guardar la tarea porque sus datos " +
-            "incumplen una restricción de integridad.",
-            exception);
 }

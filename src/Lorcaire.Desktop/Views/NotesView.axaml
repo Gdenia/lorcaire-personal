@@ -89,7 +89,7 @@
               x:Name="NoteTitle"
               Grid.Row="1"
               PlaceholderText="Note title"
-              MaxLength="200"/>
+              />
           <TextBox
               x:Name="NoteContent"
               Grid.Row="2"
@@ -98,7 +98,7 @@
               TextWrapping="Wrap"
               VerticalContentAlignment="Top"
               MinHeight="300"
-              MaxLength="20000"/>
+              />
           <Grid Grid.Row="3" ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="10">
             <TextBlock
                 x:Name="LastModifiedText"

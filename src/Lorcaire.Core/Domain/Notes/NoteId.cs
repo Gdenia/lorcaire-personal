@@ -9,7 +9,7 @@ public readonly record struct NoteId
         if (value == Guid.Empty)
         {
             throw new ArgumentException(
-                "El identificador de la nota no puede estar vacío.",
+                "The note identifier cannot be empty.",
                 nameof(value));
         }
 

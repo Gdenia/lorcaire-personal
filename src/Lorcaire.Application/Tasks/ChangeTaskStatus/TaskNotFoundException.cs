@@ -1,11 +1,13 @@
+using Lorcaire.Application.Errors;
+
 namespace Lorcaire.Application.Tasks.ChangeTaskStatus;
 
-public sealed class TaskNotFoundException : Exception
+public sealed class TaskNotFoundException : NotFoundException
 {
     public Guid TaskId { get; }
 
     public TaskNotFoundException(Guid taskId)
-        : base($"No existe la tarea con identificador '{taskId}'.")
+        : base($"No task exists with identifier '{taskId}'.")
     {
         TaskId = taskId;
     }

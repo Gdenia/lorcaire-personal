@@ -9,7 +9,7 @@ public readonly record struct AreaId
         if (value == Guid.Empty)
         {
             throw new ArgumentException(
-                "El identificador del área no puede estar vacío.",
+                "The area identifier cannot be empty.",
                 nameof(value));
         }
 

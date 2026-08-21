@@ -44,10 +44,7 @@ public sealed class SqliteResourceRepository :
         }
         catch (SqliteException exception) when (exception.SqliteErrorCode == 19)
         {
-            throw new InvalidOperationException(
-                "No se pudo guardar el recurso porque sus datos " +
-                "incumplen una restricción de integridad.",
-                exception);
+            throw SqlitePersistenceErrors.SaveConflict("resource", exception);
         }
     }
 
@@ -79,8 +76,8 @@ public sealed class SqliteResourceRepository :
         return resources;
     }
     public async Task<Resource?> GetByIdAsync(ResourceId id,CancellationToken c=default){await using var connection=_connectionFactory.CreateConnection();await connection.OpenAsync(c);await using var command=connection.CreateCommand();command.CommandText="SELECT id,area_id,name,category,description FROM resources WHERE id=$id;";command.Parameters.AddWithValue("$id",id.Value.ToString());await using var reader=await command.ExecuteReaderAsync(c);return await reader.ReadAsync(c)?ReadResource(reader):null;}
-    public async Task UpdateAsync(Resource item,CancellationToken c=default){ArgumentNullException.ThrowIfNull(item);await using var connection=_connectionFactory.CreateConnection();await connection.OpenAsync(c);await using var command=connection.CreateCommand();command.CommandText="UPDATE resources SET area_id=$areaId,name=$name,category=$category,description=$description WHERE id=$id;";AddParameters(command,item);if(await command.ExecuteNonQueryAsync(c)==0)throw new InvalidOperationException($"No existe un recurso con identificador '{item.Id}'.");}
-    public async Task<bool> DeleteAsync(ResourceId id,CancellationToken c=default){await using var connection=_connectionFactory.CreateConnection();await connection.OpenAsync(c);await using var command=connection.CreateCommand();command.CommandText="DELETE FROM resources WHERE id=$id;";command.Parameters.AddWithValue("$id",id.Value.ToString());try{return await command.ExecuteNonQueryAsync(c)==1;}catch(SqliteException ex)when(ex.SqliteErrorCode==19){throw new InvalidOperationException("The resource cannot be deleted because other information depends on it.",ex);}}
+    public async Task UpdateAsync(Resource item,CancellationToken c=default){ArgumentNullException.ThrowIfNull(item);await using var connection=_connectionFactory.CreateConnection();await connection.OpenAsync(c);await using var command=connection.CreateCommand();command.CommandText="UPDATE resources SET area_id=$areaId,name=$name,category=$category,description=$description WHERE id=$id;";AddParameters(command,item);try{if(await command.ExecuteNonQueryAsync(c)==0)throw SqlitePersistenceErrors.MissingDuringUpdate("resource");}catch(SqliteException ex)when(ex.SqliteErrorCode==19){throw SqlitePersistenceErrors.SaveConflict("resource",ex);}}
+    public async Task<bool> DeleteAsync(ResourceId id,CancellationToken c=default){await using var connection=_connectionFactory.CreateConnection();await connection.OpenAsync(c);await using var command=connection.CreateCommand();command.CommandText="DELETE FROM resources WHERE id=$id;";command.Parameters.AddWithValue("$id",id.Value.ToString());try{return await command.ExecuteNonQueryAsync(c)==1;}catch(SqliteException ex)when(ex.SqliteErrorCode==19){throw SqlitePersistenceErrors.DeleteConflict("resource",ex);}}
     private static Resource ReadResource(SqliteDataReader r)=>new(new ResourceId(Guid.Parse(r.GetString(0))),new AreaId(Guid.Parse(r.GetString(1))),r.GetString(2),r.GetString(3),r.IsDBNull(4)?null:r.GetString(4));
     private static void AddParameters(SqliteCommand c,Resource r){c.Parameters.AddWithValue("$id",r.Id.Value.ToString());c.Parameters.AddWithValue("$areaId",r.AreaId.Value.ToString());c.Parameters.AddWithValue("$name",r.Name);c.Parameters.AddWithValue("$category",r.Category);c.Parameters.AddWithValue("$description",r.Description is null?DBNull.Value:r.Description);}
 }

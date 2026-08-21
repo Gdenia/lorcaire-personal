@@ -22,7 +22,7 @@
         <TextBox
             x:Name="DisplayName"
             PlaceholderText="Display name"
-            MaxLength="100"/>
+            />
       </StackPanel>
     </Border>
 

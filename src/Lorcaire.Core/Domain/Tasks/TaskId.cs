@@ -9,7 +9,7 @@ public readonly record struct TaskId
         if (value == Guid.Empty)
         {
             throw new ArgumentException(
-                "El identificador de la tarea no puede estar vacío.",
+                "The task identifier cannot be empty.",
                 nameof(value));
         }
 

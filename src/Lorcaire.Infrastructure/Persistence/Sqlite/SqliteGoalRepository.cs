@@ -82,10 +82,7 @@ public sealed class SqliteGoalRepository :
         catch (SqliteException exception)
             when (exception.SqliteErrorCode == 19)
         {
-            throw new InvalidOperationException(
-                "No se pudo guardar el objetivo porque sus datos " +
-                "incumplen una restricción de integridad.",
-                exception);
+            throw SqlitePersistenceErrors.SaveConflict("goal", exception);
         }
     }
 
@@ -138,13 +135,12 @@ public sealed class SqliteGoalRepository :
 
             if (affectedRows == 0)
             {
-                throw new InvalidOperationException(
-                    $"No existe un objetivo con identificador '{goal.Id}'.");
+                throw SqlitePersistenceErrors.MissingDuringUpdate("goal");
             }
         }
         catch (SqliteException exception) when (exception.SqliteErrorCode == 19)
         {
-            throw CreateIntegrityException(exception);
+            throw SqlitePersistenceErrors.SaveConflict("goal", exception);
         }
     }
 
@@ -164,9 +160,7 @@ public sealed class SqliteGoalRepository :
         }
         catch (SqliteException exception) when (exception.SqliteErrorCode == 19)
         {
-            throw new InvalidOperationException(
-                "The goal cannot be deleted because other information depends on it.",
-                exception);
+            throw SqlitePersistenceErrors.DeleteConflict("goal", exception);
         }
     }
 
@@ -224,10 +218,4 @@ public sealed class SqliteGoalRepository :
         command.Parameters.AddWithValue("$isCompleted", goal.IsCompleted ? 1 : 0);
     }
 
-    private static InvalidOperationException CreateIntegrityException(
-        SqliteException exception) =>
-        new(
-            "No se pudo guardar el objetivo porque sus datos " +
-            "incumplen una restricción de integridad.",
-            exception);
 }

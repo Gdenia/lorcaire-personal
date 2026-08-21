@@ -35,7 +35,7 @@ public sealed class InMemoryResourceRepositoryTests
             "Book");
         await repository.AddAsync(resource);
 
-        await Assert.ThrowsAsync<InvalidOperationException>(
+        await Assert.ThrowsAsync<ConflictException>(
             () => repository.AddAsync(resource));
     }
 }

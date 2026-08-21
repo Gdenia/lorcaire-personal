@@ -21,18 +21,18 @@
         <TextBox
             x:Name="ResourceName"
             PlaceholderText="Resource name"
-            MaxLength="200"/>
+            />
         <TextBox
             x:Name="ResourceCategory"
             PlaceholderText="Category (for example: Book, Course, Tool)"
-            MaxLength="100"/>
+            />
         <TextBox
             x:Name="ResourceDescription"
             PlaceholderText="Description (optional)"
             AcceptsReturn="True"
             TextWrapping="Wrap"
             MinHeight="80"
-            MaxLength="1000"/>
+            />
         <StackPanel Orientation="Horizontal" Spacing="10"><Button
             x:Name="CreateResourceButton"
             Content="Create resource"

@@ -5,6 +5,7 @@ using Lorcaire.Application.Goals.Persistence;
 using Lorcaire.Application.Goals.UpdateGoal;
 using Lorcaire.Core.Domain.Areas;
 using Lorcaire.Core.Domain.Goals;
+using Lorcaire.Core.Domain;
 
 namespace Lorcaire.Application.Tests.Goals.ManageGoals;
 
@@ -37,6 +38,27 @@ public sealed class ManageGoalHandlersTests
 
         Assert.Equal("Goal", goal.Name);
         Assert.Equal("Description", goal.Description);
+        Assert.Equal(0, repository.UpdateCount);
+    }
+
+    [Fact]
+    public async Task Update_RejectsInvalidDescription_WithoutPartialMutation()
+    {
+        var goal = CreateGoal(isCompleted: true);
+        var repository = new FakeGoalRepository(goal);
+
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            new UpdateGoalHandler(repository).HandleAsync(
+                new UpdateGoalCommand(
+                    goal.Id.Value,
+                    "Changed name",
+                    new string(
+                        'x',
+                        DomainTextLimits.DescriptionMaximumLength + 1))));
+
+        Assert.Equal("Goal", goal.Name);
+        Assert.Equal("Description", goal.Description);
+        Assert.True(goal.IsCompleted);
         Assert.Equal(0, repository.UpdateCount);
     }
 

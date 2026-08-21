@@ -21,14 +21,14 @@
         <TextBox
             x:Name="ProjectName"
             PlaceholderText="Project name"
-            MaxLength="200"/>
+            />
         <TextBox
             x:Name="ProjectDescription"
             PlaceholderText="Description (optional)"
             AcceptsReturn="True"
             TextWrapping="Wrap"
             MinHeight="80"
-            MaxLength="1000"/>
+            />
         <StackPanel Orientation="Horizontal" Spacing="10">
         <Button
             x:Name="CreateProjectButton"

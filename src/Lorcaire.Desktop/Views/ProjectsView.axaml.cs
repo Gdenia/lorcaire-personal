@@ -5,6 +5,8 @@ using Lorcaire.Application.Projects.CreateProject;
 using Lorcaire.Application.Projects.GetProjects;
 using Lorcaire.Application.Projects.DeleteProject;
 using Lorcaire.Application.Projects.UpdateProject;
+using Lorcaire.Desktop.Presentation;
+using Lorcaire.Core.Domain;
 
 namespace Lorcaire.Desktop.Views;
 
@@ -39,6 +41,8 @@ public partial class ProjectsView : UserControl
         _workspaceContext = workspaceContext;
 
         InitializeComponent();
+        ProjectName.MaxLength = DomainTextLimits.NameMaximumLength;
+        ProjectDescription.MaxLength = DomainTextLimits.DescriptionMaximumLength;
         Loaded += LoadProjects;
     }
 
@@ -48,7 +52,7 @@ public partial class ProjectsView : UserControl
     }
     private async void SaveProject(object? sender, RoutedEventArgs e)
     {
-        if (_editingId is not Guid id) return; try { await _updateProjectHandler.HandleAsync(new UpdateProjectCommand(id, ProjectName.Text ?? string.Empty, ProjectDescription.Text)); ResetForm(); await RefreshProjectsAsync(); OperationMessage.Text="Project updated."; } catch(Exception ex) { OperationMessage.Text=$"Unable to update project: {ex.Message}"; }
+        if (_editingId is not Guid id) return; try { await _updateProjectHandler.HandleAsync(new UpdateProjectCommand(id, ProjectName.Text ?? string.Empty, ProjectDescription.Text)); ResetForm(); await RefreshProjectsAsync(); OperationMessage.Text="Project updated."; } catch(Exception ex) { OperationMessage.Text=UserErrorMessages.Format("Unable to update project",ex); }
     }
     private void CancelEdit(object? sender, RoutedEventArgs e) => ResetForm();
     private void DeleteProject(object? sender, RoutedEventArgs e)
@@ -58,7 +62,7 @@ public partial class ProjectsView : UserControl
     private async void ConfirmDelete(object? sender, RoutedEventArgs e)
     {
         if (_pendingDeleteId is not Guid id) return;
-        try { await _deleteProjectHandler.HandleAsync(id); if (_editingId==id) ResetForm(); await RefreshProjectsAsync(); OperationMessage.Text="Project deleted."; } catch(Exception ex) { OperationMessage.Text=$"Unable to delete project: {ex.Message}"; } finally { ClearDelete(); }
+        try { await _deleteProjectHandler.HandleAsync(id); if (_editingId==id) ResetForm(); await RefreshProjectsAsync(); OperationMessage.Text="Project deleted."; } catch(Exception ex) { OperationMessage.Text=UserErrorMessages.Format("Unable to delete project",ex); } finally { ClearDelete(); }
     }
     private void CancelDelete(object? sender, RoutedEventArgs e) { ClearDelete(); OperationMessage.Text="Deletion cancelled."; }
     private void ClearDelete() { _pendingDeleteId=null; ConfirmDeleteButton.IsVisible=false; CancelDeleteButton.IsVisible=false; }
@@ -72,8 +76,9 @@ public partial class ProjectsView : UserControl
         }
         catch (Exception exception)
         {
-            OperationMessage.Text =
-                $"Unable to load projects: {exception.Message}";
+            OperationMessage.Text = UserErrorMessages.Format(
+                "Unable to load projects",
+                exception);
         }
     }
 
@@ -97,8 +102,9 @@ public partial class ProjectsView : UserControl
         }
         catch (Exception exception)
         {
-            OperationMessage.Text =
-                $"Unable to create project: {exception.Message}";
+            OperationMessage.Text = UserErrorMessages.Format(
+                "Unable to create project",
+                exception);
         }
         finally
         {

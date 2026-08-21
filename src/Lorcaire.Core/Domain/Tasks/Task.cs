@@ -17,6 +17,8 @@ public sealed class Task
         string? description = null,
         bool isCompleted = false)
     {
+        DomainValidation.EnsureIdentifier(id.Value, "task", nameof(id));
+        DomainValidation.EnsureIdentifier(areaId.Value, "area", nameof(areaId));
         Id = id;
         AreaId = areaId;
         Title = ValidateTitle(title);
@@ -29,22 +31,32 @@ public sealed class Task
     public void ChangeDescription(string? description) =>
         Description = NormalizeDescription(description);
 
+    public void UpdateDetails(string title, string? description)
+    {
+        var validatedTitle = ValidateTitle(title);
+        var validatedDescription = NormalizeDescription(description);
+
+        Title = validatedTitle;
+        Description = validatedDescription;
+    }
+
     public void Complete() => IsCompleted = true;
 
     public void Reopen() => IsCompleted = false;
 
     private static string ValidateTitle(string title)
     {
-        if (string.IsNullOrWhiteSpace(title))
-        {
-            throw new ArgumentException(
-                "La tarea debe tener un título.",
-                nameof(title));
-        }
-
-        return title.Trim();
+        return DomainValidation.RequiredText(
+            title,
+            DomainTextLimits.TitleMaximumLength,
+            "task title",
+            nameof(title));
     }
 
     private static string? NormalizeDescription(string? description) =>
-        string.IsNullOrWhiteSpace(description) ? null : description.Trim();
+        DomainValidation.OptionalText(
+            description,
+            DomainTextLimits.DescriptionMaximumLength,
+            "task description",
+            nameof(description));
 }

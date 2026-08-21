@@ -31,7 +31,7 @@ public sealed class InMemoryProjectRepositoryTests
         var project = new Project(ProjectId.New(), AreaId.New(), "Proyecto");
         await repository.AddAsync(project);
 
-        await Assert.ThrowsAsync<InvalidOperationException>(
+        await Assert.ThrowsAsync<ConflictException>(
             () => repository.AddAsync(project));
     }
 }

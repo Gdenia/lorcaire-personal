@@ -43,10 +43,7 @@ public sealed class SqliteProjectRepository :
         }
         catch (SqliteException exception) when (exception.SqliteErrorCode == 19)
         {
-            throw new InvalidOperationException(
-                "No se pudo guardar el proyecto porque sus datos " +
-                "incumplen una restricción de integridad.",
-                exception);
+            throw SqlitePersistenceErrors.SaveConflict("project", exception);
         }
     }
 
@@ -89,7 +86,8 @@ public sealed class SqliteProjectRepository :
     {
         ArgumentNullException.ThrowIfNull(project); await using var connection = _connectionFactory.CreateConnection(); await connection.OpenAsync(cancellationToken);
         await using var command = connection.CreateCommand(); command.CommandText = "UPDATE projects SET area_id=$areaId, name=$name, description=$description WHERE id=$id;"; AddParameters(command, project);
-        if (await command.ExecuteNonQueryAsync(cancellationToken) == 0) throw new InvalidOperationException($"No existe un proyecto con identificador '{project.Id}'.");
+        try { if (await command.ExecuteNonQueryAsync(cancellationToken) == 0) throw SqlitePersistenceErrors.MissingDuringUpdate("project"); }
+        catch (SqliteException exception) when (exception.SqliteErrorCode == 19) { throw SqlitePersistenceErrors.SaveConflict("project", exception); }
     }
 
     public async Task<bool> DeleteAsync(ProjectId id, CancellationToken cancellationToken = default)
@@ -97,7 +95,7 @@ public sealed class SqliteProjectRepository :
         await using var connection = _connectionFactory.CreateConnection(); await connection.OpenAsync(cancellationToken);
         await using var command = connection.CreateCommand(); command.CommandText = "DELETE FROM projects WHERE id=$id;"; command.Parameters.AddWithValue("$id", id.Value.ToString());
         try { return await command.ExecuteNonQueryAsync(cancellationToken) == 1; }
-        catch (SqliteException ex) when (ex.SqliteErrorCode == 19) { throw new InvalidOperationException("The project cannot be deleted because other information depends on it.", ex); }
+        catch (SqliteException ex) when (ex.SqliteErrorCode == 19) { throw SqlitePersistenceErrors.DeleteConflict("project", ex); }
     }
 
     private static Project ReadProject(SqliteDataReader reader) => new(new ProjectId(Guid.Parse(reader.GetString(0))), new AreaId(Guid.Parse(reader.GetString(1))), reader.GetString(2), reader.IsDBNull(3) ? null : reader.GetString(3));

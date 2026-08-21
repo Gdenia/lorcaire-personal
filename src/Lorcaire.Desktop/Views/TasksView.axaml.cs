@@ -7,6 +7,8 @@ using Lorcaire.Application.Tasks.GetTasks;
 using Lorcaire.Application.Tasks.UpdateTask;
 using Lorcaire.Application.Tasks.DeleteTask;
 using Lorcaire.Application.Settings;
+using Lorcaire.Desktop.Presentation;
+using Lorcaire.Core.Domain;
 
 namespace Lorcaire.Desktop.Views;
 
@@ -53,13 +55,15 @@ public partial class TasksView : UserControl
         _workspaceContext = workspaceContext;
 
         InitializeComponent();
+        TaskTitle.MaxLength = DomainTextLimits.TitleMaximumLength;
+        TaskDescription.MaxLength = DomainTextLimits.DescriptionMaximumLength;
         Loaded += LoadTasks;
     }
     private void BeginEdit(object? sender,RoutedEventArgs e){if(sender is not Button{Tag:Guid id})return;var item=_tasks.Single(x=>x.Id==id);_editingId=id;TaskTitle.Text=item.Title;TaskDescription.Text=item.Description;FormTitle.Text="Edit task";CreateTaskButton.IsVisible=false;SaveTaskButton.IsVisible=true;CancelTaskButton.IsVisible=true;}
-    private async void SaveTask(object? sender,RoutedEventArgs e){if(_editingId is not Guid id)return;try{await _updateTaskHandler.HandleAsync(new(id,TaskTitle.Text??string.Empty,TaskDescription.Text));ResetForm();await RefreshTasksAsync();OperationMessage.Text="Task updated.";}catch(Exception ex){OperationMessage.Text=$"Unable to update task: {ex.Message}";}}
+    private async void SaveTask(object? sender,RoutedEventArgs e){if(_editingId is not Guid id)return;try{await _updateTaskHandler.HandleAsync(new(id,TaskTitle.Text??string.Empty,TaskDescription.Text));ResetForm();await RefreshTasksAsync();OperationMessage.Text="Task updated.";}catch(Exception ex){OperationMessage.Text=UserErrorMessages.Format("Unable to update task",ex);}}
     private void CancelEdit(object? sender,RoutedEventArgs e)=>ResetForm();
     private void DeleteTask(object? sender,RoutedEventArgs e){if(sender is not Button{Tag:Guid id})return;_pendingDeleteId=id;ConfirmDeleteButton.IsVisible=true;CancelDeleteButton.IsVisible=true;OperationMessage.Text="Confirm or cancel the deletion.";}
-    private async void ConfirmDelete(object? sender,RoutedEventArgs e){if(_pendingDeleteId is not Guid id)return;try{await _deleteTaskHandler.HandleAsync(id);if(_editingId==id)ResetForm();await RefreshTasksAsync();OperationMessage.Text="Task deleted.";}catch(Exception ex){OperationMessage.Text=$"Unable to delete task: {ex.Message}";}finally{ClearDelete();}}
+    private async void ConfirmDelete(object? sender,RoutedEventArgs e){if(_pendingDeleteId is not Guid id)return;try{await _deleteTaskHandler.HandleAsync(id);if(_editingId==id)ResetForm();await RefreshTasksAsync();OperationMessage.Text="Task deleted.";}catch(Exception ex){OperationMessage.Text=UserErrorMessages.Format("Unable to delete task",ex);}finally{ClearDelete();}}
     private void CancelDelete(object? sender,RoutedEventArgs e){ClearDelete();OperationMessage.Text="Deletion cancelled.";}
     private void ClearDelete(){_pendingDeleteId=null;ConfirmDeleteButton.IsVisible=false;CancelDeleteButton.IsVisible=false;}
     private void ResetForm(){_editingId=null;TaskTitle.Text="";TaskDescription.Text="";FormTitle.Text="Create a task";CreateTaskButton.IsVisible=true;SaveTaskButton.IsVisible=false;CancelTaskButton.IsVisible=false;}
@@ -72,8 +76,9 @@ public partial class TasksView : UserControl
         }
         catch (Exception exception)
         {
-            OperationMessage.Text =
-                $"Unable to load tasks: {exception.Message}";
+            OperationMessage.Text = UserErrorMessages.Format(
+                "Unable to load tasks",
+                exception);
         }
     }
 
@@ -97,8 +102,9 @@ public partial class TasksView : UserControl
         }
         catch (Exception exception)
         {
-            OperationMessage.Text =
-                $"Unable to create task: {exception.Message}";
+            OperationMessage.Text = UserErrorMessages.Format(
+                "Unable to create task",
+                exception);
         }
         finally
         {
@@ -145,8 +151,9 @@ public partial class TasksView : UserControl
         }
         catch (Exception exception)
         {
-            OperationMessage.Text =
-                $"Unable to update task: {exception.Message}";
+            OperationMessage.Text = UserErrorMessages.Format(
+                "Unable to update task",
+                exception);
         }
         finally
         {

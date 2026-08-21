@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using Lorcaire.Application.Resources.Persistence;
+using Lorcaire.Application.Errors;
 using Lorcaire.Core.Domain.Resources;
 
 namespace Lorcaire.Infrastructure.Persistence.Memory;
@@ -19,8 +20,8 @@ public sealed class InMemoryResourceRepository :
 
         if (!_resources.TryAdd(resource.Id, resource))
         {
-            throw new InvalidOperationException(
-                $"Ya existe un recurso con identificador '{resource.Id}'.");
+            throw new ConflictException(
+                "A resource with the same identifier already exists.");
         }
 
         return Task.CompletedTask;
@@ -37,6 +38,6 @@ public sealed class InMemoryResourceRepository :
         return Task.FromResult(resources);
     }
     public Task<Resource?> GetByIdAsync(ResourceId id,CancellationToken c=default){c.ThrowIfCancellationRequested();_resources.TryGetValue(id,out var item);return Task.FromResult(item);}
-    public Task UpdateAsync(Resource item,CancellationToken c=default){ArgumentNullException.ThrowIfNull(item);c.ThrowIfCancellationRequested();if(!_resources.ContainsKey(item.Id))throw new InvalidOperationException($"No existe un recurso con identificador '{item.Id}'.");_resources[item.Id]=item;return Task.CompletedTask;}
+    public Task UpdateAsync(Resource item,CancellationToken c=default){ArgumentNullException.ThrowIfNull(item);c.ThrowIfCancellationRequested();if(!_resources.ContainsKey(item.Id))throw new ConflictException("The resource could not be updated because it no longer exists.");_resources[item.Id]=item;return Task.CompletedTask;}
     public Task<bool> DeleteAsync(ResourceId id,CancellationToken c=default){c.ThrowIfCancellationRequested();return Task.FromResult(_resources.TryRemove(id,out _));}
 }

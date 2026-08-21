@@ -15,7 +15,7 @@ internal static class LocalDateTimeResolver
 
         if (timeZone.IsInvalidTime(localDateTime))
         {
-            throw new InvalidOperationException(
+            throw new ArgumentException(
                 "The selected local time does not exist because the clocks " +
                 "move forward. Choose another time.");
         }

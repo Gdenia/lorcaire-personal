@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Lorcaire.Application.Dashboard;
+using Lorcaire.Desktop.Presentation;
 
 namespace Lorcaire.Desktop.Views;
 
@@ -70,8 +71,9 @@ public partial class DashboardView : UserControl
         }
         catch (Exception exception)
         {
-            OperationMessage.Text =
-                $"Unable to load dashboard: {exception.Message}";
+            OperationMessage.Text = UserErrorMessages.Format(
+                "Unable to load dashboard",
+                exception);
         }
     }
 

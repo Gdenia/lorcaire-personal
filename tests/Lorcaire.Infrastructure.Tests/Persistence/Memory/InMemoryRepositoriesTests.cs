@@ -44,7 +44,7 @@ public sealed class InMemoryRepositoriesTests
 
         await repository.AddAsync(goal);
 
-        await Assert.ThrowsAsync<InvalidOperationException>(
+        await Assert.ThrowsAsync<ConflictException>(
             () => repository.AddAsync(goal));
     }
 

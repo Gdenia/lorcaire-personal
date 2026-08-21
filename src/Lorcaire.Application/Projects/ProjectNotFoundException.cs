@@ -1,2 +1,4 @@
+using Lorcaire.Application.Errors;
+
 namespace Lorcaire.Application.Projects;
-public sealed class ProjectNotFoundException(Guid id) : Exception($"No project exists with identifier '{id}'.");
+public sealed class ProjectNotFoundException(Guid id) : NotFoundException($"No project exists with identifier '{id}'.");

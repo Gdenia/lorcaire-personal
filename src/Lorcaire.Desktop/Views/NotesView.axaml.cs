@@ -5,6 +5,8 @@ using Lorcaire.Application.Notes.CreateNote;
 using Lorcaire.Application.Notes.GetNotes;
 using Lorcaire.Application.Notes.UpdateNote;
 using Lorcaire.Application.Notes.DeleteNote;
+using Lorcaire.Desktop.Presentation;
+using Lorcaire.Core.Domain;
 
 namespace Lorcaire.Desktop.Views;
 
@@ -38,6 +40,8 @@ public partial class NotesView : UserControl
         _workspaceContext = workspaceContext;
 
         InitializeComponent();
+        NoteTitle.MaxLength = DomainTextLimits.TitleMaximumLength;
+        NoteContent.MaxLength = DomainTextLimits.NoteContentMaximumLength;
         Loaded += LoadNotes;
     }
 
@@ -49,8 +53,9 @@ public partial class NotesView : UserControl
         }
         catch (Exception exception)
         {
-            OperationMessage.Text =
-                $"Unable to load notes: {exception.Message}";
+            OperationMessage.Text = UserErrorMessages.Format(
+                "Unable to load notes",
+                exception);
         }
     }
 
@@ -77,7 +82,7 @@ public partial class NotesView : UserControl
         _deletePending=false;CancelDeleteButton.IsVisible=false;DeleteNoteButton.Content="Delete";
         OperationMessage.Text = string.Empty;
     }
-    private async void DeleteNote(object? sender,RoutedEventArgs e){if(_selectedNoteId is not Guid id)return;if(!_deletePending){_deletePending=true;DeleteNoteButton.Content="Confirm delete";CancelDeleteButton.IsVisible=true;OperationMessage.Text="Confirm deletion or cancel.";return;}try{await _deleteNoteHandler.HandleAsync(id);ResetEditor();await RefreshNotesAsync();OperationMessage.Text="Note deleted.";}catch(Exception ex){OperationMessage.Text=$"Unable to delete note: {ex.Message}";}}
+    private async void DeleteNote(object? sender,RoutedEventArgs e){if(_selectedNoteId is not Guid id)return;if(!_deletePending){_deletePending=true;DeleteNoteButton.Content="Confirm delete";CancelDeleteButton.IsVisible=true;OperationMessage.Text="Confirm deletion or cancel.";return;}try{await _deleteNoteHandler.HandleAsync(id);ResetEditor();await RefreshNotesAsync();OperationMessage.Text="Note deleted.";}catch(Exception ex){OperationMessage.Text=UserErrorMessages.Format("Unable to delete note",ex);}}
     private void CancelDelete(object? sender,RoutedEventArgs e){_deletePending=false;DeleteNoteButton.Content="Delete";CancelDeleteButton.IsVisible=false;OperationMessage.Text="Deletion cancelled.";}
 
     private async void SaveNote(object? sender, RoutedEventArgs e)
@@ -111,8 +116,9 @@ public partial class NotesView : UserControl
         }
         catch (Exception exception)
         {
-            OperationMessage.Text =
-                $"Unable to save note: {exception.Message}";
+            OperationMessage.Text = UserErrorMessages.Format(
+                "Unable to save note",
+                exception);
         }
         finally
         {

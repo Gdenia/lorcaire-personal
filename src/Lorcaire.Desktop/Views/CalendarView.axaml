@@ -21,14 +21,14 @@
         <TextBox
             x:Name="EventTitle"
             PlaceholderText="Event title"
-            MaxLength="200"/>
+            />
         <TextBox
             x:Name="EventDescription"
             PlaceholderText="Description (optional)"
             AcceptsReturn="True"
             TextWrapping="Wrap"
             MinHeight="70"
-            MaxLength="1000"/>
+            />
 
         <TextBlock Text="Starts" Foreground="#E8B04A"/>
         <Grid ColumnDefinitions="*,*" ColumnSpacing="12">

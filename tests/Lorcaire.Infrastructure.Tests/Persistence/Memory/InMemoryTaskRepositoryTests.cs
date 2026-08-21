@@ -45,7 +45,7 @@ public sealed class InMemoryTaskRepositoryTests
         var task = new DomainTask(TaskId.New(), AreaId.New(), "Tarea");
         await repository.AddAsync(task);
 
-        await Assert.ThrowsAsync<InvalidOperationException>(
+        await Assert.ThrowsAsync<ConflictException>(
             () => repository.AddAsync(task));
     }
 }

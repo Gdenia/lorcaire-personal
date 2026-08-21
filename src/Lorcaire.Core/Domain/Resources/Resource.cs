@@ -17,41 +17,72 @@ public sealed class Resource
         string category,
         string? description = null)
     {
+        DomainValidation.EnsureIdentifier(id.Value, "resource", nameof(id));
+        DomainValidation.EnsureIdentifier(areaId.Value, "area", nameof(areaId));
         Id = id;
         AreaId = areaId;
-        Name = ValidateRequired(name, "El recurso debe tener un nombre.", nameof(name));
+        Name = ValidateName(name);
         Category = ValidateRequired(
             category,
-            "El recurso debe tener una categoría.",
+            DomainTextLimits.CategoryMaximumLength,
+            "resource category",
             nameof(category));
         Description = NormalizeDescription(description);
     }
 
     public void Rename(string name) =>
-        Name = ValidateRequired(name, "El recurso debe tener un nombre.", nameof(name));
+        Name = ValidateName(name);
 
     public void ChangeCategory(string category) =>
         Category = ValidateRequired(
             category,
-            "El recurso debe tener una categoría.",
+            DomainTextLimits.CategoryMaximumLength,
+            "resource category",
             nameof(category));
 
     public void ChangeDescription(string? description) =>
         Description = NormalizeDescription(description);
 
-    private static string ValidateRequired(
-        string value,
-        string message,
-        string parameterName)
+    public void UpdateDetails(
+        string name,
+        string category,
+        string? description)
     {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            throw new ArgumentException(message, parameterName);
-        }
+        var validatedName = ValidateName(name);
+        var validatedCategory = ValidateRequired(
+            category,
+            DomainTextLimits.CategoryMaximumLength,
+            "resource category",
+            nameof(category));
+        var validatedDescription = NormalizeDescription(description);
 
-        return value.Trim();
+        Name = validatedName;
+        Category = validatedCategory;
+        Description = validatedDescription;
     }
 
+    private static string ValidateName(string name) =>
+        ValidateRequired(
+            name,
+            DomainTextLimits.NameMaximumLength,
+            "resource name",
+            nameof(name));
+
+    private static string ValidateRequired(
+        string value,
+        int maximumLength,
+        string fieldName,
+        string parameterName)
+        => DomainValidation.RequiredText(
+            value,
+            maximumLength,
+            fieldName,
+            parameterName);
+
     private static string? NormalizeDescription(string? description) =>
-        string.IsNullOrWhiteSpace(description) ? null : description.Trim();
+        DomainValidation.OptionalText(
+            description,
+            DomainTextLimits.DescriptionMaximumLength,
+            "resource description",
+            nameof(description));
 }

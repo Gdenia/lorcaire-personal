@@ -97,7 +97,7 @@ public sealed class SqliteCalendarEventRepositoryTests
             "Event",
             Now);
 
-        await Assert.ThrowsAsync<InvalidOperationException>(
+        await Assert.ThrowsAsync<ConflictException>(
             () => repository.AddAsync(calendarEvent));
     }
 
@@ -114,7 +114,7 @@ public sealed class SqliteCalendarEventRepositoryTests
             Now);
         await repository.AddAsync(calendarEvent);
 
-        await Assert.ThrowsAsync<InvalidOperationException>(
+        await Assert.ThrowsAsync<ConflictException>(
             () => repository.AddAsync(calendarEvent));
     }
 

@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using Lorcaire.Application.Goals.Persistence;
+using Lorcaire.Application.Errors;
 using Lorcaire.Core.Domain.Goals;
 
 namespace Lorcaire.Infrastructure.Persistence.Memory;
@@ -19,8 +20,8 @@ public sealed class InMemoryGoalRepository :
 
         if (!_goals.TryAdd(goal.Id, goal))
         {
-            throw new InvalidOperationException(
-                $"Ya existe un objetivo con identificador '{goal.Id}'.");
+            throw new ConflictException(
+                "A goal with the same identifier already exists.");
         }
 
         return Task.CompletedTask;
@@ -56,8 +57,8 @@ public sealed class InMemoryGoalRepository :
 
         if (!_goals.TryGetValue(goal.Id, out _))
         {
-            throw new InvalidOperationException(
-                $"No existe un objetivo con identificador '{goal.Id}'.");
+            throw new ConflictException(
+                "The goal could not be updated because it no longer exists.");
         }
 
         _goals[goal.Id] = goal;

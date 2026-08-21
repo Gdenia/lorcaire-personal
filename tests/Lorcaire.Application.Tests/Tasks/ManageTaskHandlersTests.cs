@@ -4,6 +4,7 @@ using Lorcaire.Application.Tasks.Persistence;
 using Lorcaire.Application.Tasks.UpdateTask;
 using Lorcaire.Core.Domain.Areas;
 using Lorcaire.Core.Domain.Tasks;
+using Lorcaire.Core.Domain;
 using DomainTask = Lorcaire.Core.Domain.Tasks.Task;
 namespace Lorcaire.Application.Tests.Tasks;
 public sealed class ManageTaskHandlersTests
@@ -18,6 +19,20 @@ public sealed class ManageTaskHandlersTests
         Assert.Equal("New", task.Title);
         await new DeleteTaskHandler(repository).HandleAsync(task.Id.Value);
         await Assert.ThrowsAsync<TaskNotFoundException>(() => new DeleteTaskHandler(repository).HandleAsync(task.Id.Value));
+    }
+    [Fact]
+    public async System.Threading.Tasks.Task UpdateFailure_DoesNotPartiallyMutateTask()
+    {
+        var task = new DomainTask(TaskId.New(), AreaId.New(), "Old", "Original", true);
+        var repository = new Repository(task);
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            new UpdateTaskHandler(repository).HandleAsync(new(
+                task.Id.Value,
+                "New",
+                new string('x', DomainTextLimits.DescriptionMaximumLength + 1))));
+        Assert.Equal("Old", task.Title);
+        Assert.Equal("Original", task.Description);
+        Assert.True(task.IsCompleted);
     }
     private sealed class Repository(params DomainTask[] values) : ITaskRepository
     {

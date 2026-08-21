@@ -7,6 +7,8 @@ using Lorcaire.Application.Goals.CreateGoal;
 using Lorcaire.Application.Goals.DeleteGoal;
 using Lorcaire.Application.Goals.GetGoals;
 using Lorcaire.Application.Goals.UpdateGoal;
+using Lorcaire.Desktop.Presentation;
+using Lorcaire.Core.Domain;
 
 namespace Lorcaire.Desktop.Views;
 
@@ -49,6 +51,8 @@ public partial class GoalsView : UserControl
         _workspaceContext = workspaceContext;
 
         InitializeComponent();
+        GoalName.MaxLength = DomainTextLimits.NameMaximumLength;
+        GoalDescription.MaxLength = DomainTextLimits.DescriptionMaximumLength;
         Loaded += LoadGoals;
     }
 
@@ -194,10 +198,6 @@ public partial class GoalsView : UserControl
 
     private void ShowError(string operation, Exception exception)
     {
-        OperationMessage.Text = exception switch
-        {
-            ArgumentException or GoalNotFoundException or AreaNotFoundException => exception.Message,
-            _ => $"{operation}: {exception.Message}"
-        };
+        OperationMessage.Text = UserErrorMessages.Format(operation, exception);
     }
 }

@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using Lorcaire.Application.Tasks.Persistence;
+using Lorcaire.Application.Errors;
 using Lorcaire.Core.Domain.Tasks;
 using DomainTask = Lorcaire.Core.Domain.Tasks.Task;
 
@@ -18,8 +19,8 @@ public sealed class InMemoryTaskRepository : ITaskRepository, ITaskReader
 
         if (!_tasks.TryAdd(task.Id, task))
         {
-            throw new InvalidOperationException(
-                $"Ya existe una tarea con identificador '{task.Id}'.");
+            throw new ConflictException(
+                "A task with the same identifier already exists.");
         }
 
         return System.Threading.Tasks.Task.CompletedTask;
@@ -43,8 +44,8 @@ public sealed class InMemoryTaskRepository : ITaskRepository, ITaskReader
 
         if (!_tasks.ContainsKey(task.Id))
         {
-            throw new InvalidOperationException(
-                $"No existe una tarea con identificador '{task.Id}'.");
+            throw new ConflictException(
+                "The task could not be updated because it no longer exists.");
         }
 
         _tasks[task.Id] = task;

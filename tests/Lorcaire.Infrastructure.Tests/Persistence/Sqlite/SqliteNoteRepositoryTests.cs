@@ -105,7 +105,7 @@ public sealed class SqliteNoteRepositoryTests
             "Content",
             DateTimeOffset.UtcNow);
 
-        await Assert.ThrowsAsync<InvalidOperationException>(
+        await Assert.ThrowsAsync<ConflictException>(
             () => repository.AddAsync(note));
     }
 
@@ -121,7 +121,7 @@ public sealed class SqliteNoteRepositoryTests
             "Content",
             DateTimeOffset.UtcNow);
 
-        await Assert.ThrowsAsync<InvalidOperationException>(
+        await Assert.ThrowsAsync<ConflictException>(
             () => repository.UpdateAsync(note));
     }
 

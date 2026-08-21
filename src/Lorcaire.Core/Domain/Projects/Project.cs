@@ -15,6 +15,8 @@ public sealed class Project
         string name,
         string? description = null)
     {
+        DomainValidation.EnsureIdentifier(id.Value, "project", nameof(id));
+        DomainValidation.EnsureIdentifier(areaId.Value, "area", nameof(areaId));
         Id = id;
         AreaId = areaId;
         Name = ValidateName(name);
@@ -26,18 +28,28 @@ public sealed class Project
     public void ChangeDescription(string? description) =>
         Description = NormalizeDescription(description);
 
+    public void UpdateDetails(string name, string? description)
+    {
+        var validatedName = ValidateName(name);
+        var validatedDescription = NormalizeDescription(description);
+
+        Name = validatedName;
+        Description = validatedDescription;
+    }
+
     private static string ValidateName(string name)
     {
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            throw new ArgumentException(
-                "El proyecto debe tener un nombre.",
-                nameof(name));
-        }
-
-        return name.Trim();
+        return DomainValidation.RequiredText(
+            name,
+            DomainTextLimits.NameMaximumLength,
+            "project name",
+            nameof(name));
     }
 
     private static string? NormalizeDescription(string? description) =>
-        string.IsNullOrWhiteSpace(description) ? null : description.Trim();
+        DomainValidation.OptionalText(
+            description,
+            DomainTextLimits.DescriptionMaximumLength,
+            "project description",
+            nameof(description));
 }

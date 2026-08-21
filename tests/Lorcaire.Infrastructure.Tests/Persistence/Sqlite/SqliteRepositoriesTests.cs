@@ -64,7 +64,7 @@ public sealed class SqliteRepositoriesTests
             AreaId.New(),
             "Objetivo sin área existente");
 
-        await Assert.ThrowsAsync<InvalidOperationException>(
+        await Assert.ThrowsAsync<ConflictException>(
             () => repository.AddAsync(goal));
     }
 
@@ -84,7 +84,7 @@ public sealed class SqliteRepositoriesTests
 
         await repository.AddAsync(goal);
 
-        await Assert.ThrowsAsync<InvalidOperationException>(
+        await Assert.ThrowsAsync<ConflictException>(
             () => repository.AddAsync(goal));
     }
 

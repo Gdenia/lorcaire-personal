@@ -15,8 +15,7 @@ public sealed class UpdateGoalHandler(IGoalRepository goalRepository)
         var goal = await goalRepository.GetByIdAsync(goalId, cancellationToken)
             ?? throw new GoalNotFoundException(command.GoalId);
 
-        goal.Rename(command.Name);
-        goal.ChangeDescription(command.Description);
+        goal.UpdateDetails(command.Name, command.Description);
 
         await goalRepository.UpdateAsync(goal, cancellationToken);
     }

@@ -9,7 +9,7 @@ public readonly record struct CalendarEventId
         if (value == Guid.Empty)
         {
             throw new ArgumentException(
-                "El identificador del evento no puede estar vacío.",
+                "The calendar event identifier cannot be empty.",
                 nameof(value));
         }
 

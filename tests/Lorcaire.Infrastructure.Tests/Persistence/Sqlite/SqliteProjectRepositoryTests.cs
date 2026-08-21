@@ -34,7 +34,7 @@ public sealed class SqliteProjectRepositoryTests
         var repository = new SqliteProjectRepository(database.ConnectionFactory);
         var project = new Project(ProjectId.New(), AreaId.New(), "Proyecto");
 
-        await Assert.ThrowsAsync<InvalidOperationException>(
+        await Assert.ThrowsAsync<ConflictException>(
             () => repository.AddAsync(project));
     }
 
@@ -49,7 +49,7 @@ public sealed class SqliteProjectRepositoryTests
             "Proyecto");
         await repository.AddAsync(project);
 
-        await Assert.ThrowsAsync<InvalidOperationException>(
+        await Assert.ThrowsAsync<ConflictException>(
             () => repository.AddAsync(project));
     }
 
