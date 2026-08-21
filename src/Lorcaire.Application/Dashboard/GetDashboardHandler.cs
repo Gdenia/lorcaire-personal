@@ -71,6 +71,9 @@ public sealed class GetDashboardHandler
         var notes = await notesTask;
         var preferences = await preferencesTask;
         var now = _timeProvider.GetUtcNow();
+        var projectNames = projects.ToDictionary(
+            project => project.Id,
+            project => project.Name);
 
         var pendingTasks = tasks
             .Where(task => !task.IsCompleted)
@@ -78,7 +81,10 @@ public sealed class GetDashboardHandler
             .Select(task => new DashboardTaskItem(
                 task.Id.Value,
                 task.Title,
-                task.Description))
+                task.Description,
+                task.ProjectId is { } projectId
+                    ? projectNames.GetValueOrDefault(projectId)
+                    : null))
             .ToArray();
 
         var upcomingEvents = events

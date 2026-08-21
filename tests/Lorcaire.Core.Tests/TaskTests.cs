@@ -1,4 +1,5 @@
 using Lorcaire.Core.Domain.Areas;
+using Lorcaire.Core.Domain.Projects;
 using Lorcaire.Core.Domain.Tasks;
 using DomainTask = Lorcaire.Core.Domain.Tasks.Task;
 
@@ -64,6 +65,37 @@ public sealed class TaskTests
         var task = CreateTask();
         task.ChangeDescription("  ");
         Assert.Null(task.Description);
+    }
+
+    [Fact]
+    public void ProjectAssignment_IsOptionalAndSurvivesOtherChanges()
+    {
+        var projectId = ProjectId.New();
+        var task = new DomainTask(
+            TaskId.New(),
+            AreaId.New(),
+            "Task",
+            projectId: projectId);
+
+        task.Rename("Renamed");
+        task.ChangeDescription("Changed");
+        task.Complete();
+
+        Assert.Equal(projectId, task.ProjectId);
+        Assert.True(task.IsCompleted);
+
+        task.RemoveFromProject();
+        Assert.Null(task.ProjectId);
+    }
+
+    [Fact]
+    public void AssignToProject_RejectsDefaultProjectId()
+    {
+        var task = CreateTask();
+
+        Assert.Throws<ArgumentException>(() =>
+            task.AssignToProject(default));
+        Assert.Null(task.ProjectId);
     }
 
     [Fact]

@@ -1,5 +1,7 @@
 using Lorcaire.Core.Domain.Areas;
 using Lorcaire.Core.Domain.Projects;
+using DomainTask = Lorcaire.Core.Domain.Tasks.Task;
+using TaskId = Lorcaire.Core.Domain.Tasks.TaskId;
 using Lorcaire.Infrastructure.Persistence.Sqlite;
 
 namespace Lorcaire.Infrastructure.Tests.Persistence.Sqlite;
@@ -55,6 +57,26 @@ public sealed class SqliteProjectRepositoryTests
 
     [Fact] public async Task ProjectRepository_UpdatesAndDeletes()
     { await using var database=await TemporaryDatabase.CreateAsync(); var r=new SqliteProjectRepository(database.ConnectionFactory); var p=new Project(ProjectId.New(),database.DefaultAreaId,"Old"); await r.AddAsync(p); p.Rename("New"); await r.UpdateAsync(p); Assert.Equal("New",(await r.GetByIdAsync(p.Id))!.Name); Assert.True(await r.DeleteAsync(p.Id)); Assert.False(await r.DeleteAsync(p.Id)); }
+
+    [Fact]
+    public async Task ProjectRepository_RejectsDeletionWhenTasksDependOnProject()
+    {
+        await using var database = await TemporaryDatabase.CreateAsync();
+        var projects = new SqliteProjectRepository(database.ConnectionFactory);
+        var tasks = new SqliteTaskRepository(database.ConnectionFactory);
+        var project = new Project(
+            ProjectId.New(), database.DefaultAreaId, "Project");
+        await projects.AddAsync(project);
+        await tasks.AddAsync(new DomainTask(
+            TaskId.New(),
+            database.DefaultAreaId,
+            "Task",
+            projectId: project.Id));
+
+        await Assert.ThrowsAsync<ConflictException>(() =>
+            projects.DeleteAsync(project.Id));
+        Assert.NotNull(await projects.GetByIdAsync(project.Id));
+    }
 
     private sealed class TemporaryDatabase : IAsyncDisposable
     {

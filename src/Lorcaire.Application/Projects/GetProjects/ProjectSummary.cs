@@ -4,4 +4,5 @@ public sealed record ProjectSummary(
     Guid Id,
     Guid AreaId,
     string Name,
-    string? Description);
+    string? Description,
+    int TaskCount);

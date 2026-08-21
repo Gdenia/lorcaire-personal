@@ -56,6 +56,11 @@
                   <StackPanel Spacing="4">
                     <TextBlock Text="{Binding Title}" Foreground="White" FontWeight="SemiBold"/>
                     <TextBlock Text="{Binding Description}" Foreground="#929AA5" TextWrapping="Wrap"/>
+                    <TextBlock
+                        Text="{Binding ProjectName, StringFormat='Project: {0}'}"
+                        Foreground="#E8B04A"
+                        FontSize="12"
+                        IsVisible="{Binding ProjectName, Converter={x:Static ObjectConverters.IsNotNull}}"/>
                   </StackPanel>
                 </Border>
               </DataTemplate>

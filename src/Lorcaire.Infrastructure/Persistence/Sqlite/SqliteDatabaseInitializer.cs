@@ -362,6 +362,20 @@ public sealed class SqliteDatabaseInitializer
         SqliteConnection connection,
         CancellationToken cancellationToken)
     {
+        var taskColumns = new List<string>
+        {
+            "id",
+            "area_id",
+            "title",
+            "description",
+            "is_completed"
+        };
+
+        if (CurrentSchemaVersion >= 8)
+        {
+            taskColumns.Add("project_id");
+        }
+
         var expectedSchema = new Dictionary<string, string[]>
         {
             ["schema_migrations"] = ["version", "name", "applied_at"],
@@ -369,8 +383,7 @@ public sealed class SqliteDatabaseInitializer
             ["goals"] =
                 ["id", "area_id", "name", "description", "is_completed"],
             ["projects"] = ["id", "area_id", "name", "description"],
-            ["tasks"] =
-                ["id", "area_id", "title", "description", "is_completed"],
+            ["tasks"] = taskColumns.ToArray(),
             ["resources"] =
                 ["id", "area_id", "name", "category", "description"],
             ["calendar_events"] =

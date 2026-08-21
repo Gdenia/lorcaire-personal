@@ -15,9 +15,9 @@ public sealed class SqliteDatabaseInitializerTests
 
         await initializer.InitializeAsync(areaId);
 
-        Assert.Equal(7, initializer.CurrentSchemaVersion);
+        Assert.Equal(8, initializer.CurrentSchemaVersion);
         Assert.Equal(
-            [1, 2, 3, 4, 5, 6, 7],
+            [1, 2, 3, 4, 5, 6, 7, 8],
             await ReadVersionsAsync(database.Factory));
         Assert.Equal(
             1L,
@@ -70,7 +70,7 @@ public sealed class SqliteDatabaseInitializerTests
             .InitializeAsync(areaId);
 
         Assert.Equal(
-            [1, 2, 3, 4, 5, 6, 7],
+            [1, 2, 3, 4, 5, 6, 7, 8],
             await ReadVersionsAsync(database.Factory));
         Assert.Equal(
             "Legacy goal|Preserved|0",
@@ -111,7 +111,8 @@ public sealed class SqliteDatabaseInitializerTests
                 "Create tasks",
                 "Create resources and calendar events",
                 "Create notes",
-                "Normalize calendar event timestamps to UTC"
+                "Normalize calendar event timestamps to UTC",
+                "Assign tasks to optional projects"
             ],
             names);
     }
@@ -154,7 +155,7 @@ public sealed class SqliteDatabaseInitializerTests
                 """,
                 ("$id", eventId.ToString())));
         Assert.Equal(
-            [1, 2, 3, 4, 5, 6, 7],
+            [1, 2, 3, 4, 5, 6, 7, 8],
             await ReadVersionsAsync(database.Factory));
 
         var backupPath = Assert.Single(
@@ -167,6 +168,46 @@ public sealed class SqliteDatabaseInitializerTests
                 new SqliteConnectionFactory(backupPath),
                 "SELECT start_at FROM calendar_events WHERE id = $id;",
                 ("$id", eventId.ToString())));
+    }
+
+    [Fact]
+    public async Task InitializeAsync_AddsNullableProjectToExistingTasks()
+    {
+        await using var database = TemporaryDatabase.Create();
+        var areaId = AreaId.New();
+        var taskId = Guid.NewGuid();
+        await new SqliteDatabaseInitializer(
+                database.Factory,
+                SqliteMigrations.All.Take(7).ToArray())
+            .InitializeAsync(areaId);
+        await ExecuteAsync(
+            database.Factory,
+            """
+            INSERT INTO tasks
+                (id, area_id, title, description, is_completed)
+            VALUES
+                ($id, $areaId, 'Existing task', NULL, 1);
+            """,
+            ("$id", taskId.ToString()),
+            ("$areaId", areaId.Value.ToString()));
+
+        await new SqliteDatabaseInitializer(database.Factory)
+            .InitializeAsync(areaId);
+
+        Assert.Equal(
+            "Existing task|1|none",
+            await ExecuteScalarAsync<string>(
+                database.Factory,
+                """
+                SELECT title || '|' || is_completed || '|' ||
+                       COALESCE(project_id, 'none')
+                FROM tasks
+                WHERE id = $id;
+                """,
+                ("$id", taskId.ToString())));
+        Assert.Equal(
+            [1, 2, 3, 4, 5, 6, 7, 8],
+            await ReadVersionsAsync(database.Factory));
     }
 
     [Fact]
@@ -215,7 +256,7 @@ public sealed class SqliteDatabaseInitializerTests
                 "SELECT name FROM projects WHERE id = $id;",
                 ("$id", projectId.ToString())));
         Assert.Equal(
-            [1, 2, 3, 4, 5, 6, 7],
+            [1, 2, 3, 4, 5, 6, 7, 8],
             await ReadVersionsAsync(database.Factory));
         Assert.Equal(
             1L,
@@ -235,7 +276,7 @@ public sealed class SqliteDatabaseInitializerTests
         var migrations = SqliteMigrations.All
             .Append(
                 new SqliteMigration(
-                    8,
+                    9,
                     "Count execution",
                     requiresBackup: false,
                     async (connection, transaction, cancellationToken) =>
@@ -256,7 +297,7 @@ public sealed class SqliteDatabaseInitializerTests
         await initializer.InitializeAsync(AreaId.New());
 
         Assert.Equal(1, applyCount);
-        Assert.Equal(8, (await ReadVersionsAsync(database.Factory)).Count);
+        Assert.Equal(9, (await ReadVersionsAsync(database.Factory)).Count);
     }
 
     [Fact]
@@ -266,7 +307,7 @@ public sealed class SqliteDatabaseInitializerTests
         var migrations = SqliteMigrations.All
             .Append(
                 new SqliteMigration(
-                    8,
+                    9,
                     "Fail after schema change",
                     requiresBackup: false,
                     ApplyFailingMigrationAsync))
@@ -278,8 +319,8 @@ public sealed class SqliteDatabaseInitializerTests
         var exception = await Assert.ThrowsAsync<SqliteMigrationException>(
             () => initializer.InitializeAsync(AreaId.New()));
 
-        Assert.Equal(8, exception.Version);
-        Assert.DoesNotContain(8, await ReadVersionsAsync(database.Factory));
+        Assert.Equal(9, exception.Version);
+        Assert.DoesNotContain(9, await ReadVersionsAsync(database.Factory));
         Assert.Equal(
             0L,
             await ExecuteScalarAsync<long>(
@@ -309,7 +350,7 @@ public sealed class SqliteDatabaseInitializerTests
                 () => initializer.InitializeAsync(AreaId.New()));
 
         Assert.Equal(999, exception.DatabaseVersion);
-        Assert.Equal(7, exception.SupportedVersion);
+        Assert.Equal(8, exception.SupportedVersion);
     }
 
     [Fact]
@@ -321,7 +362,7 @@ public sealed class SqliteDatabaseInitializerTests
         var migrations = SqliteMigrations.All
             .Append(
                 SqliteMigration.FromScript(
-                    8,
+                    9,
                     "Risky migration",
                     "CREATE TABLE backup_probe (id INTEGER);",
                     requiresBackup: true))
@@ -333,9 +374,9 @@ public sealed class SqliteDatabaseInitializerTests
         var backupPath = Assert.Single(
             Directory.GetFiles(
                 database.DirectoryPath,
-                "lorcaire.db.backup-v8-*"));
+                "lorcaire.db.backup-v9-*"));
         var backupFactory = new SqliteConnectionFactory(backupPath);
-        Assert.Equal(7L, await ExecuteScalarAsync<long>(
+        Assert.Equal(8L, await ExecuteScalarAsync<long>(
             backupFactory,
             "SELECT MAX(version) FROM schema_migrations;"));
     }

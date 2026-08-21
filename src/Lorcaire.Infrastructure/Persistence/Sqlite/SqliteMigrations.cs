@@ -167,7 +167,13 @@ internal static class SqliteMigrations
             7,
             "Normalize calendar event timestamps to UTC",
             requiresBackup: true,
-            NormalizeCalendarEventTimestampsAsync)
+            NormalizeCalendarEventTimestampsAsync),
+
+        new SqliteMigration(
+            8,
+            "Assign tasks to optional projects",
+            requiresBackup: false,
+            AddOptionalTaskProjectAsync)
     ];
 
     private static async Task AddGoalCompletionStateAsync(
@@ -193,6 +199,41 @@ internal static class SqliteMigrations
             ADD COLUMN is_completed INTEGER NOT NULL DEFAULT 0;
             """;
         await command.ExecuteNonQueryAsync(cancellationToken);
+    }
+
+    private static async Task AddOptionalTaskProjectAsync(
+        SqliteConnection connection,
+        SqliteTransaction transaction,
+        CancellationToken cancellationToken)
+    {
+        if (!await ColumnExistsAsync(
+                connection,
+                transaction,
+                "tasks",
+                "project_id",
+                cancellationToken))
+        {
+            await using var alterCommand = connection.CreateCommand();
+            alterCommand.Transaction = transaction;
+            alterCommand.CommandText =
+                """
+                ALTER TABLE tasks
+                ADD COLUMN project_id TEXT NULL
+                    REFERENCES projects (id)
+                    ON UPDATE RESTRICT
+                    ON DELETE RESTRICT;
+                """;
+            await alterCommand.ExecuteNonQueryAsync(cancellationToken);
+        }
+
+        await using var indexCommand = connection.CreateCommand();
+        indexCommand.Transaction = transaction;
+        indexCommand.CommandText =
+            """
+            CREATE INDEX IF NOT EXISTS ix_tasks_project_id
+                ON tasks (project_id);
+            """;
+        await indexCommand.ExecuteNonQueryAsync(cancellationToken);
     }
 
     private static async Task<bool> ColumnExistsAsync(

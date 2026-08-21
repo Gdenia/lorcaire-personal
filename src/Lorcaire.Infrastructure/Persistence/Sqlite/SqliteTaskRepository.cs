@@ -1,5 +1,6 @@
 using Lorcaire.Application.Tasks.Persistence;
 using Lorcaire.Core.Domain.Areas;
+using Lorcaire.Core.Domain.Projects;
 using Lorcaire.Core.Domain.Tasks;
 using Microsoft.Data.Sqlite;
 using DomainTask = Lorcaire.Core.Domain.Tasks.Task;
@@ -26,8 +27,10 @@ public sealed class SqliteTaskRepository : ITaskRepository, ITaskReader
         await using var command = connection.CreateCommand();
         command.CommandText =
             """
-            INSERT INTO tasks (id, area_id, title, description, is_completed)
-            VALUES ($id, $areaId, $title, $description, $isCompleted);
+            INSERT INTO tasks
+                (id, area_id, title, description, is_completed, project_id)
+            VALUES
+                ($id, $areaId, $title, $description, $isCompleted, $projectId);
             """;
         AddParameters(command, task);
 
@@ -50,7 +53,7 @@ public sealed class SqliteTaskRepository : ITaskRepository, ITaskReader
         await using var command = connection.CreateCommand();
         command.CommandText =
             """
-            SELECT id, area_id, title, description, is_completed
+            SELECT id, area_id, title, description, is_completed, project_id
             FROM tasks
             WHERE id = $id;
             """;
@@ -73,7 +76,8 @@ public sealed class SqliteTaskRepository : ITaskRepository, ITaskReader
             SET area_id = $areaId,
                 title = $title,
                 description = $description,
-                is_completed = $isCompleted
+                is_completed = $isCompleted,
+                project_id = $projectId
             WHERE id = $id;
             """;
         AddParameters(command, task);
@@ -98,7 +102,7 @@ public sealed class SqliteTaskRepository : ITaskRepository, ITaskReader
         await using var command = connection.CreateCommand();
         command.CommandText =
             """
-            SELECT id, area_id, title, description, is_completed
+            SELECT id, area_id, title, description, is_completed, project_id
             FROM tasks
             ORDER BY is_completed, title COLLATE NOCASE;
             """;
@@ -119,7 +123,10 @@ public sealed class SqliteTaskRepository : ITaskRepository, ITaskReader
             new AreaId(Guid.Parse(reader.GetString(1))),
             reader.GetString(2),
             reader.IsDBNull(3) ? null : reader.GetString(3),
-            reader.GetInt64(4) == 1);
+            reader.GetInt64(4) == 1,
+            reader.IsDBNull(5)
+                ? null
+                : new ProjectId(Guid.Parse(reader.GetString(5))));
 
     private static void AddParameters(
         SqliteCommand command,
@@ -132,6 +139,11 @@ public sealed class SqliteTaskRepository : ITaskRepository, ITaskReader
             "$description",
             task.Description is null ? DBNull.Value : task.Description);
         command.Parameters.AddWithValue("$isCompleted", task.IsCompleted ? 1 : 0);
+        command.Parameters.AddWithValue(
+            "$projectId",
+            task.ProjectId is null
+                ? DBNull.Value
+                : task.ProjectId.Value.Value.ToString());
     }
 
 }

@@ -5,4 +5,6 @@ public sealed record TaskSummary(
     Guid AreaId,
     string Title,
     string? Description,
-    bool IsCompleted);
+    bool IsCompleted,
+    Guid? ProjectId,
+    string? ProjectName);

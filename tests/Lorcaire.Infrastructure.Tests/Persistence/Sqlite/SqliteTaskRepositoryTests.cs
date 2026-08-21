@@ -1,4 +1,5 @@
 using Lorcaire.Core.Domain.Areas;
+using Lorcaire.Core.Domain.Projects;
 using Lorcaire.Core.Domain.Tasks;
 using Lorcaire.Infrastructure.Persistence.Sqlite;
 using DomainTask = Lorcaire.Core.Domain.Tasks.Task;
@@ -49,6 +50,55 @@ public sealed class SqliteTaskRepositoryTests
         completed.Reopen();
         await repository.UpdateAsync(completed);
         Assert.False((await repository.GetByIdAsync(task.Id))!.IsCompleted);
+    }
+
+    [Fact]
+    public async System.Threading.Tasks.Task Repository_PersistsChangesToOptionalProject()
+    {
+        await using var database = await TemporaryDatabase.CreateAsync();
+        var projects = new SqliteProjectRepository(database.ConnectionFactory);
+        var tasks = new SqliteTaskRepository(database.ConnectionFactory);
+        var first = new Project(
+            ProjectId.New(), database.DefaultAreaId, "First");
+        var second = new Project(
+            ProjectId.New(), database.DefaultAreaId, "Second");
+        await projects.AddAsync(first);
+        await projects.AddAsync(second);
+        var task = new DomainTask(
+            TaskId.New(),
+            database.DefaultAreaId,
+            "Task",
+            isCompleted: true,
+            projectId: first.Id);
+        await tasks.AddAsync(task);
+
+        var stored = await tasks.GetByIdAsync(task.Id);
+        Assert.Equal(first.Id, stored!.ProjectId);
+
+        stored.UpdateDetails("Changed", null, second.Id);
+        await tasks.UpdateAsync(stored);
+        var moved = await tasks.GetByIdAsync(task.Id);
+        Assert.Equal(second.Id, moved!.ProjectId);
+        Assert.True(moved.IsCompleted);
+
+        moved.RemoveFromProject();
+        await tasks.UpdateAsync(moved);
+        Assert.Null((await tasks.GetByIdAsync(task.Id))!.ProjectId);
+    }
+
+    [Fact]
+    public async System.Threading.Tasks.Task Repository_RejectsUnknownProject()
+    {
+        await using var database = await TemporaryDatabase.CreateAsync();
+        var repository = new SqliteTaskRepository(database.ConnectionFactory);
+        var task = new DomainTask(
+            TaskId.New(),
+            database.DefaultAreaId,
+            "Task",
+            projectId: ProjectId.New());
+
+        await Assert.ThrowsAsync<ConflictException>(() =>
+            repository.AddAsync(task));
     }
 
     [Fact]

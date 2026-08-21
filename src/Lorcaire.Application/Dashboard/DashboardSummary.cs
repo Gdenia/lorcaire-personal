@@ -14,7 +14,8 @@ public sealed record DashboardSummary(
 public sealed record DashboardTaskItem(
     Guid Id,
     string Title,
-    string? Description);
+    string? Description,
+    string? ProjectName);
 
 public sealed record DashboardEventItem(
     Guid Id,

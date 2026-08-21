@@ -46,6 +46,7 @@ public sealed class GetDashboardHandlerTests
             NoteId.New(), areaId, "Created", "Body", Now.AddHours(-3));
         var updatedNote = new Note(
             NoteId.New(), areaId, "Updated", "Body", Now.AddDays(-1), Now.AddHours(-1));
+        var project = new Project(ProjectId.New(), areaId, "Project");
 
         var handler = CreateHandler(
             goals:
@@ -53,11 +54,15 @@ public sealed class GetDashboardHandlerTests
                 new Goal(GoalId.New(), areaId, "Active"),
                 new Goal(GoalId.New(), areaId, "Done", isCompleted: true)
             ],
-            projects: [new Project(ProjectId.New(), areaId, "Project")],
+            projects: [project],
             tasks:
             [
                 new DomainTask(TaskId.New(), areaId, "Zulu"),
-                new DomainTask(TaskId.New(), areaId, "Alpha"),
+                new DomainTask(
+                    TaskId.New(),
+                    areaId,
+                    "Alpha",
+                    projectId: project.Id),
                 new DomainTask(TaskId.New(), areaId, "Completed", isCompleted: true)
             ],
             resources: [new Resource(ResourceId.New(), areaId, "Book", "Reference")],
@@ -85,6 +90,8 @@ public sealed class GetDashboardHandlerTests
         Assert.Equal(2, summary.PendingTaskCount);
         Assert.Equal(1, summary.ResourceCount);
         Assert.Equal(["Alpha", "Zulu"], summary.PendingTasks.Select(task => task.Title));
+        Assert.Equal("Project", summary.PendingTasks[0].ProjectName);
+        Assert.Null(summary.PendingTasks[1].ProjectName);
         Assert.Equal(
             ["Ongoing", "Soon", "Later"],
             summary.UpcomingEvents.Select(item => item.Title));

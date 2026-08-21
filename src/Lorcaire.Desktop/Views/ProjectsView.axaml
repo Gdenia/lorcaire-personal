@@ -78,6 +78,10 @@
                     Text="{Binding Description}"
                     Foreground="#929AA5"
                     TextWrapping="Wrap"/>
+                <TextBlock
+                    Text="{Binding TaskCount, StringFormat='Tasks: {0}'}"
+                    Foreground="#E8B04A"
+                    FontSize="12"/>
               </StackPanel><StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center"><Button Content="Edit" Tag="{Binding Id}" Click="BeginEdit" Padding="14,8" Background="#20262D" Foreground="White"/><Button Content="Delete" Tag="{Binding Id}" Click="DeleteProject" Padding="14,8" Background="#3A2024" Foreground="#F2A0A7"/></StackPanel></Grid>
             </Border>
           </DataTemplate>
